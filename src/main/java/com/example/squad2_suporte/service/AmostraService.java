@@ -46,32 +46,6 @@ public class AmostraService {
     private TriatomineosMapper triatomineoMapper;
 
     @Transactional
-    public RetornoEscorpiaoDto cadastrarAmostraEscorpioes (EscorpiaoDto dados){
-        System.out.println("rCEBENDO "+ dados.dataHora());
-        Escorpioes novaAmostra = escorpiaoMapper.dtoParaEntidade(dados);
-        System.out.println(novaAmostra.getDataHora());
-        amostraEscorpiaoRepository.save(novaAmostra);
-
-        return escorpiaoMapper.entidadeParaRetorno(novaAmostra);
-    }
-
-    @Transactional
-    public RetornoFlebotomineosDto cadastrarAmostraFlebotomineos (FlebotomineosDto dados){
-        Flebotomineos novaAmostra = flebotomineoMapper.dtoParaEntidade(dados);
-        amostraFlebotomineosRepository.save(novaAmostra);
-
-        return flebotomineoMapper.entidadeParaRetorno(novaAmostra);
-    }
-
-    @Transactional
-    public RetornoTriatomineosDto cadastrarAmostraTriatomineos (TriatomineosDto dados){
-        Triatomineos novaAmostra = triatomineoMapper.dtoParaEntidade(dados);
-        amostraTriatomineosRepository.save(novaAmostra);
-
-        return triatomineoMapper.entidadeParaRetorno(novaAmostra);
-    }
-
-    @Transactional
     public Object cadastrarAmostraUnificada(AmostraDto dto) {
         switch (dto.tipoAmostra()) {
             case ESCORPIAO -> {
