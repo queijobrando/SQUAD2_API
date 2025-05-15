@@ -1,6 +1,7 @@
 package com.example.squad2_suporte.Amostras.mapper;
 
 import com.example.squad2_suporte.Classes.Escorpioes;
+import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.enviotipoamostras.EscorpiaoDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import org.mapstruct.Mapper;
@@ -16,5 +17,8 @@ public interface EscorpiaoMapper {
 
     @Mapping(target = "enderecoDto", source = "endereco")
     RetornoEscorpiaoDto entidadeParaRetorno(Escorpioes escorpioes);
+
+    EscorpiaoDto fromAmostraDto(AmostraDto dto);
+
 }
 
