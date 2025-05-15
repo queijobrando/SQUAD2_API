@@ -2,6 +2,7 @@ package com.example.squad2_suporte.Amostras.mapper;
 
 import com.example.squad2_suporte.Classes.Escorpioes;
 import com.example.squad2_suporte.Classes.Triatomineos;
+import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.enviotipoamostras.TriatomineosDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoTriatomineosDto;
@@ -18,6 +19,8 @@ public interface TriatomineosMapper {
 
     @Mapping(target = "enderecoDto", source = "endereco")
     RetornoTriatomineosDto entidadeParaRetorno(Triatomineos triatomineos);
+
+    TriatomineosDto fromAmostraDto(AmostraDto dto);
 
 }
 
