@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 
 @Entity
@@ -33,7 +34,7 @@ public class Lamina {
 
     @PrePersist
     public void definirDataHoraCriacao() {
-        this.data = LocalDateTime.now(); // define a data/hora que for cadastrada
+        this.data = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS); // define a data/hora/segundos que for cadastrada
     }
 
 }

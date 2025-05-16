@@ -19,9 +19,8 @@ public class LaminaService {
     private LaminaMapper laminaMapper;
 
     @Transactional
-    public RetornoLaminaDto cadastrarLamina(LaminaDto laminaDto){
+    public Lamina cadastrarLamina(LaminaDto laminaDto){
         Lamina lamina = laminaMapper.dtoParaEntidade(laminaDto);
-        laminaRepository.save(lamina);
-        return laminaMapper.entidadeParaRetorno(lamina);
+        return laminaRepository.save(lamina);
     }
 }
