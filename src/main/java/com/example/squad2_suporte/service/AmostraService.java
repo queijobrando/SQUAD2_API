@@ -1,22 +1,10 @@
 package com.example.squad2_suporte.service;
 
-import com.example.squad2_suporte.Amostras.mapper.EscorpiaoMapper;
-import com.example.squad2_suporte.Amostras.mapper.FlebotomineosMapper;
-import com.example.squad2_suporte.Amostras.mapper.TriatomineosMapper;
-import com.example.squad2_suporte.Classes.Escorpioes;
-import com.example.squad2_suporte.Classes.Flebotomineos;
-import com.example.squad2_suporte.Classes.Triatomineos;
+import com.example.squad2_suporte.Amostras.mapper.*;
+import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.EscorpiaoDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.FlebotomineosDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.TriatomineosDto;
-import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
-import com.example.squad2_suporte.dto.retornotipoamostras.RetornoFlebotomineosDto;
-import com.example.squad2_suporte.dto.retornotipoamostras.RetornoTriatomineosDto;
-import com.example.squad2_suporte.repositorios.AmostraEscorpiaoRepository;
-import com.example.squad2_suporte.repositorios.AmostraFlebotomineosRepository;
-import com.example.squad2_suporte.repositorios.AmostraRepository;
-import com.example.squad2_suporte.repositorios.AmostraTriatomineosRepository;
+import com.example.squad2_suporte.dto.enviotipoamostras.*;
+import com.example.squad2_suporte.repositorios.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +25,12 @@ public class AmostraService {
     private AmostraTriatomineosRepository amostraTriatomineosRepository;
 
     @Autowired
+    private AmostraMoluscoRepository amostraMoluscoRepository;
+
+    @Autowired
+    private AmostraLarvaRepository amostraLarvaRepository;
+
+    @Autowired
     private EscorpiaoMapper escorpiaoMapper;
 
     @Autowired
@@ -44,6 +38,12 @@ public class AmostraService {
 
     @Autowired
     private TriatomineosMapper triatomineoMapper;
+
+    @Autowired
+    private MoluscoMapper moluscoMapper;
+
+    @Autowired
+    private LarvasMapper larvasMapper;
 
     @Transactional
     public Object cadastrarAmostraUnificada(AmostraDto dto) {
@@ -65,6 +65,18 @@ public class AmostraService {
                 Triatomineos triato = triatomineoMapper.dtoParaEntidade(triatoDto);
                 amostraTriatomineosRepository.save(triato);
                 return triatomineoMapper.entidadeParaRetorno(triato);
+            }
+            case MOLUSCO -> {
+                MoluscoDto moluscoDto = moluscoMapper.fromAmostraDto(dto);
+                Molusco molusco = moluscoMapper.dtoParaEntidade(moluscoDto);
+                amostraMoluscoRepository.save(molusco);
+                return moluscoMapper.entidadeParaRetorno(molusco);
+            }
+            case LARVAS -> {
+                LarvasDto larvasDto = larvasMapper.fromAmostraDto(dto);
+                Larvas larvas = larvasMapper.dtoParaEntidade(larvasDto);
+                amostraLarvaRepository.save(larvas);
+                return larvasMapper.entidadeParaRetorno(larvas);
             }
             default -> throw new IllegalArgumentException("Tipo de amostra inválido: " + dto.tipoAmostra());
         }

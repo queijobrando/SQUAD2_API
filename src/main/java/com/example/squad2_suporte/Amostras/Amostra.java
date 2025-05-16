@@ -1,8 +1,7 @@
 package com.example.squad2_suporte.Amostras;
 
 import com.example.squad2_suporte.Amostras.endereco.Endereco;
-import com.example.squad2_suporte.Classes.Escorpioes;
-import com.example.squad2_suporte.Classes.Flebotomineos;
+import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.enuns.TipoAmostra;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,7 +28,10 @@ import java.time.LocalDateTime;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Escorpioes.class, name = "ESCORPIAO"),
-        @JsonSubTypes.Type(value = Flebotomineos.class, name = "FLEBOTOMINEO")
+        @JsonSubTypes.Type(value = Flebotomineos.class, name = "FLEBOTOMINEO"),
+        @JsonSubTypes.Type(value = Triatomineos.class, name = "TRIATOMINEO"),
+        @JsonSubTypes.Type(value = Molusco.class, name = "MOLUSCO"),
+        @JsonSubTypes.Type(value = Larvas.class, name = "LARVA")
 })
 public abstract class Amostra {
 
