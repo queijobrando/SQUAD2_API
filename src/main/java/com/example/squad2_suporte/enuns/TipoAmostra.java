@@ -3,5 +3,7 @@ package com.example.squad2_suporte.enuns;
 public enum TipoAmostra {
     ESCORPIAO,
     FLEBOTOMINEOS,
-    TRIATOMINEOS
+    TRIATOMINEOS,
+    MOLUSCO,
+    LARVAS
 }

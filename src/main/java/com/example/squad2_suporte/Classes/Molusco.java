@@ -1,49 +1,48 @@
 package com.example.squad2_suporte.Classes;
 
+import com.example.squad2_suporte.Amostras.Amostra;
+import com.example.squad2_suporte.enuns.Resultado;
+import com.example.squad2_suporte.enuns.molusco.TipoMolusco;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-//@Entity
-//Table(name = "moluscos")
+@Entity
+@Table(name = "moluscos")
 @Getter
 @Setter
-public class Molusco {
+public class Molusco extends Amostra {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_molusco")
-    private Integer idMolusco;
+    private Long id;
 
-    @Column(name = "identificacao_parcial")
-    private String identificacaoParcial;
+    private String colecaoHidrica;
 
-    @Column(name = "num_caramujos_mortos")
-    private Integer numCaramujosMortos;
+    @Column(nullable = false)
+    private Integer numMoluscos;
 
-    @Column(name = "exposicao_a_luz")
-    private Integer exposicaoALuz;
+    @Column(nullable = false)
+    private TipoMolusco tipoMolusco;
 
-    // Adicione outros campos como colunas aqui
+    @Column(nullable = false)
+    private Integer numMortos;
 
-    // Construtor padrão (necessário para JPA)
+    @Column(nullable = false)
+    private boolean exposicaoLuz;
+
+    @Column(nullable = false)
+    private boolean esmagamentoConcha;
+
+    @Column(nullable = false)
+    private boolean disseccao;
+
+    @Column(nullable = false)
+    private Resultado resultado;
+
+
     public Molusco() {
+        super();
     }
 
-    public Molusco(Integer idMolusco, String identificacaoParcial, Integer numCaramujosMortos, Integer exposicaoALuz) {
-        this.idMolusco = idMolusco;
-        this.identificacaoParcial = identificacaoParcial;
-        this.numCaramujosMortos = numCaramujosMortos;
-        this.exposicaoALuz = exposicaoALuz;
-    }
-
-    @Override
-    public String toString() {
-        return "Molusco{" +
-                "idMolusco=" + idMolusco +
-                ", identificacaoParcial='" + identificacaoParcial + '\'' +
-                ", numCaramujosMortos=" + numCaramujosMortos +
-                ", exposicaoALuz=" + exposicaoALuz +
-                '}';
-    }
 }

@@ -1,7 +1,10 @@
 package com.example.squad2_suporte.dto.amostra;
 
+import com.example.squad2_suporte.enuns.Resultado;
 import com.example.squad2_suporte.enuns.TipoAmostra;
 import com.example.squad2_suporte.enuns.flebotomineos.*;
+import com.example.squad2_suporte.enuns.larva.TipoLarva;
+import com.example.squad2_suporte.enuns.molusco.TipoMolusco;
 import com.example.squad2_suporte.enuns.triatomineos.*;
 
 import java.time.LocalDateTime;
@@ -41,5 +44,16 @@ public record AmostraDto(
         Vestigios vestigios,
         Insetifugo insetifugo,
         Integer numeroInsetos,
-        Condicao condicao) {
+        Condicao condicao,
+        String colecaoHidrica,
+        Integer numMoluscos,
+        TipoMolusco tipoMolusco,
+        Integer numMortos,
+        boolean exposicaoLuz,
+        boolean esmagamentoConcha,
+        boolean disseccao,
+        Resultado resultado,
+        Integer numLarvas,
+        TipoLarva tipoLarva,
+        String tipoImovel) {
 }
