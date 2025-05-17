@@ -14,10 +14,7 @@ import com.example.squad2_suporte.service.AmostraService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("cadastro/amostra")
@@ -32,5 +29,15 @@ public class CadastroAmostraController {
         return ResponseEntity.ok(resposta);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> removerAmostra(@PathVariable Long id) {
+        boolean remover = amostraService.deletarAmostra(id);
+        if (remover) {
+            return ResponseEntity.ok("Amostra removida!");
+        } else  {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
 
 }
