@@ -82,5 +82,11 @@ public class AmostraService {
         }
     }
 
+    public boolean deletarAmostra(Long id) {
+        return amostraRepository.findById(id).map(amostra -> {
+            amostraRepository.delete(amostra);
+            return true;}).orElse(false);
+    }
+
 
 }
