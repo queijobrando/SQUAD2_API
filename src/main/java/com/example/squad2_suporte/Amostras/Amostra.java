@@ -3,6 +3,7 @@ package com.example.squad2_suporte.Amostras;
 import com.example.squad2_suporte.Amostras.endereco.Endereco;
 import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
+import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.enuns.TipoAmostra;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -46,6 +47,10 @@ public abstract class Amostra {
   @Column(unique = true)
   private Long protocolo;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private StatusAmostra status;
+
   @Embedded
   private Endereco endereco;
 
@@ -56,6 +61,7 @@ public abstract class Amostra {
   @PrePersist
   public void gerarProtocolo(){
     this.protocolo = System.currentTimeMillis();
+    this.status = StatusAmostra.PENDENTE;
   }
 }
 
