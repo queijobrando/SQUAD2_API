@@ -29,15 +29,17 @@ public class CadastroAmostraController {
         return ResponseEntity.ok(resposta);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> removerAmostra(@PathVariable Long id) {
-        boolean remover = amostraService.deletarAmostra(id);
-        if (remover) {
-            return ResponseEntity.ok("Amostra removida!");
-        } else  {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{protocolo}")
+    public ResponseEntity<String> removerAmostra(@PathVariable Long protocolo) {
+        amostraService.deletarAmostra(protocolo);
+        return ResponseEntity.ok("Amostra removida!");
+    }
 
+    @GetMapping("/{protocolo}")
+    public ResponseEntity<?> buscarAmostra(@PathVariable Long protocolo){
+        var amostra = amostraService.buscarAmostra(protocolo);
+
+        return ResponseEntity.ok(amostra);
     }
 
 }

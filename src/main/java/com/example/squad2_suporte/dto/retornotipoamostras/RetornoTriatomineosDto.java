@@ -5,7 +5,7 @@ import com.example.squad2_suporte.enuns.triatomineos.*;
 
 import java.time.LocalDateTime;
 
-public record RetornoTriatomineosDto(Long id,
+public record RetornoTriatomineosDto(Long protocolo,
                                      LocalDateTime dataHora,
                                      EnderecoDto enderecoDto,
                                      Peridomicilio peridomicilio,

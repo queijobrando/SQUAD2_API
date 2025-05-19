@@ -6,7 +6,7 @@ import com.example.squad2_suporte.enuns.larva.TipoLarva;
 import java.time.LocalDateTime;
 
 public record RetornoLarvasDto(
-        Long id,
+        Long protocolo,
         LocalDateTime dataHora,
         EnderecoDto enderecoDto,
         Integer numLarvas,

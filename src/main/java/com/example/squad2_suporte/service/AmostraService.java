@@ -4,6 +4,7 @@ import com.example.squad2_suporte.Amostras.mapper.*;
 import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.enviotipoamostras.*;
+import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import com.example.squad2_suporte.repositorios.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,10 +83,46 @@ public class AmostraService {
         }
     }
 
-    public boolean deletarAmostra(Long id) {
-        return amostraRepository.findById(id).map(amostra -> {
+    public void deletarAmostra(Long protocolo) {
+        var amostra = amostraRepository.findByProtocolo(protocolo);
+        if (amostra == null){
+            throw new RuntimeException("Protocolo inválido ou inexistente");
+        } else {
             amostraRepository.delete(amostra);
-            return true;}).orElse(false);
+        }
+
+    }
+
+    public Object buscarAmostra(Long protocolo){
+        var amostra = amostraRepository.findByProtocolo(protocolo);
+        if (amostra == null){
+            throw new RuntimeException("Protocolo inválido ou inexistente");
+        } else {
+            switch (amostra.getTipoAmostra()){
+                case ESCORPIAO -> {
+                    Escorpioes escorpioes = amostraEscorpiaoRepository.findByProtocolo(protocolo);
+                    return escorpiaoMapper.entidadeParaRetorno(escorpioes);
+                }
+                case FLEBOTOMINEOS -> {
+                    Flebotomineos flebo = amostraFlebotomineosRepository.findByProtocolo(protocolo);
+                    return flebotomineoMapper.entidadeParaRetorno(flebo);
+                }
+                case TRIATOMINEOS -> {
+                    Triatomineos triato = amostraTriatomineosRepository.findByProtocolo(protocolo);
+                    return triatomineoMapper.entidadeParaRetorno(triato);
+                }
+                case LARVAS -> {
+                    Larvas larvas = amostraLarvaRepository.findByProtocolo(protocolo);
+                    return larvasMapper.entidadeParaRetorno(larvas);
+                }
+                case MOLUSCO -> {
+                    Molusco molusco = amostraMoluscoRepository.findByProtocolo(protocolo);
+                    return moluscoMapper.entidadeParaRetorno(molusco);
+                }
+                default -> throw new IllegalArgumentException("Amostra não encontrada");
+            }
+        }
+
     }
 
 
