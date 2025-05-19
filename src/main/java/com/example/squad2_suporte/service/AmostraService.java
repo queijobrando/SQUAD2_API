@@ -32,52 +32,40 @@ public class AmostraService {
     private AmostraLarvaRepository amostraLarvaRepository;
 
     @Autowired
-    private EscorpiaoMapper escorpiaoMapper;
-
-    @Autowired
-    private FlebotomineosMapper flebotomineoMapper;
-
-    @Autowired
-    private TriatomineosMapper triatomineoMapper;
-
-    @Autowired
-    private MoluscoMapper moluscoMapper;
-
-    @Autowired
-    private LarvasMapper larvasMapper;
+    private TipoAmostraMapper tipoAmostraMapper;
 
     @Transactional
     public Object cadastrarAmostraUnificada(AmostraDto dto) {
         switch (dto.tipoAmostra()) {
             case ESCORPIAO -> {
-                EscorpiaoDto escorpiaoDto = escorpiaoMapper.fromAmostraDto(dto);
-                Escorpioes escorpiao = escorpiaoMapper.dtoParaEntidade(escorpiaoDto);
+                EscorpiaoDto escorpiaoDto = tipoAmostraMapper.escorpiaoFromAmostraDto(dto);
+                Escorpioes escorpiao = tipoAmostraMapper.escorpiaoDtoParaEntidade(escorpiaoDto);
                 amostraEscorpiaoRepository.save(escorpiao);
-                return escorpiaoMapper.entidadeParaRetorno(escorpiao);
+                return tipoAmostraMapper.escorpiaoEntidadeParaRetorno(escorpiao);
             }
             case FLEBOTOMINEOS -> {
-                FlebotomineosDto flebotomineosDto = flebotomineoMapper.fromAmostraDto(dto);
-                Flebotomineos flebo = flebotomineoMapper.dtoParaEntidade(flebotomineosDto);
+                FlebotomineosDto flebotomineosDto = tipoAmostraMapper.flebotomineosFromAmostraDto(dto);
+                Flebotomineos flebo = tipoAmostraMapper.flebotomineosDtoParaEntidade(flebotomineosDto);
                 amostraFlebotomineosRepository.save(flebo);
-                return flebotomineoMapper.entidadeParaRetorno(flebo);
+                return tipoAmostraMapper.flebotomineosEntidadeParaRetorno(flebo);
             }
             case TRIATOMINEOS -> {
-                TriatomineosDto triatoDto = triatomineoMapper.fromAmostraDto(dto);
-                Triatomineos triato = triatomineoMapper.dtoParaEntidade(triatoDto);
+                TriatomineosDto triatoDto = tipoAmostraMapper.triatomineosFromAmostraDto(dto);
+                Triatomineos triato = tipoAmostraMapper.triatomineosDtoParaEntidade(triatoDto);
                 amostraTriatomineosRepository.save(triato);
-                return triatomineoMapper.entidadeParaRetorno(triato);
+                return tipoAmostraMapper.triatomieosEntidadeParaRetorno(triato);
             }
             case MOLUSCO -> {
-                MoluscoDto moluscoDto = moluscoMapper.fromAmostraDto(dto);
-                Molusco molusco = moluscoMapper.dtoParaEntidade(moluscoDto);
+                MoluscoDto moluscoDto = tipoAmostraMapper.moluscoFromAmostraDto(dto);
+                Molusco molusco = tipoAmostraMapper.moluscoDtoParaEntidade(moluscoDto);
                 amostraMoluscoRepository.save(molusco);
-                return moluscoMapper.entidadeParaRetorno(molusco);
+                return tipoAmostraMapper.moluscoEntidadeParaRetorno(molusco);
             }
             case LARVAS -> {
-                LarvasDto larvasDto = larvasMapper.fromAmostraDto(dto);
-                Larvas larvas = larvasMapper.dtoParaEntidade(larvasDto);
+                LarvasDto larvasDto = tipoAmostraMapper.larvasFromAmostraDto(dto);
+                Larvas larvas = tipoAmostraMapper.larvasDtoParaEntidade(larvasDto);
                 amostraLarvaRepository.save(larvas);
-                return larvasMapper.entidadeParaRetorno(larvas);
+                return tipoAmostraMapper.larvasEntidadeParaRetorno(larvas);
             }
             default -> throw new IllegalArgumentException("Tipo de amostra inválido: " + dto.tipoAmostra());
         }
@@ -101,23 +89,23 @@ public class AmostraService {
             switch (amostra.getTipoAmostra()){
                 case ESCORPIAO -> {
                     Escorpioes escorpioes = amostraEscorpiaoRepository.findByProtocolo(protocolo);
-                    return escorpiaoMapper.entidadeParaRetorno(escorpioes);
+                    return tipoAmostraMapper.escorpiaoEntidadeParaRetorno(escorpioes);
                 }
                 case FLEBOTOMINEOS -> {
                     Flebotomineos flebo = amostraFlebotomineosRepository.findByProtocolo(protocolo);
-                    return flebotomineoMapper.entidadeParaRetorno(flebo);
+                    return tipoAmostraMapper.flebotomineosEntidadeParaRetorno(flebo);
                 }
                 case TRIATOMINEOS -> {
                     Triatomineos triato = amostraTriatomineosRepository.findByProtocolo(protocolo);
-                    return triatomineoMapper.entidadeParaRetorno(triato);
+                    return tipoAmostraMapper.triatomieosEntidadeParaRetorno(triato);
                 }
                 case LARVAS -> {
                     Larvas larvas = amostraLarvaRepository.findByProtocolo(protocolo);
-                    return larvasMapper.entidadeParaRetorno(larvas);
+                    return tipoAmostraMapper.larvasEntidadeParaRetorno(larvas);
                 }
                 case MOLUSCO -> {
                     Molusco molusco = amostraMoluscoRepository.findByProtocolo(protocolo);
-                    return moluscoMapper.entidadeParaRetorno(molusco);
+                    return tipoAmostraMapper.moluscoEntidadeParaRetorno(molusco);
                 }
                 default -> throw new IllegalArgumentException("Amostra não encontrada");
             }
