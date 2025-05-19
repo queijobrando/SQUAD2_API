@@ -88,5 +88,9 @@ public class AmostraService {
             return true;}).orElse(false);
     }
 
+    public Object buscarAmostra(Long protocolo){
+        return amostraRepository.findByProtocolo(protocolo);
+    }
+
 
 }

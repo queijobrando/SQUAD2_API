@@ -6,7 +6,7 @@ import com.example.squad2_suporte.enuns.flebotomineos.*;
 import java.time.LocalDateTime;
 
 public record RetornoFlebotomineosDto(
-        Long id,
+        Long protocolo,
         LocalDateTime dataHora,
         EnderecoDto enderecoDto,
         ClassificacaoAreaLT classificacaoAreaLT,

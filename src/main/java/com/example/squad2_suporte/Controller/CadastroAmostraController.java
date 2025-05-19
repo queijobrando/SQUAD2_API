@@ -40,4 +40,11 @@ public class CadastroAmostraController {
 
     }
 
+    @GetMapping("/{protocolo}")
+    public ResponseEntity<?> buscarAmostra(@PathVariable Long protocolo){
+        var amostra = amostraService.buscarAmostra(protocolo);
+
+        return ResponseEntity.ok(amostra);
+    }
+
 }

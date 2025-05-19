@@ -43,6 +43,9 @@ public abstract class Amostra {
   @Column(nullable = false)
   private LocalDateTime dataHora;
 
+  @Column(unique = true)
+  private Long protocolo;
+
   @Embedded
   private Endereco endereco;
 
@@ -50,11 +53,9 @@ public abstract class Amostra {
   @JsonIgnore // O JsonSubTypes vai ignorar quando retornar em formato json (evitar dois campos repetidos)
   private TipoAmostra tipoAmostra; // tipo da amostra (ele é setado automaticamente no tipo correspondente)
 
-  /*
-  public Amostra(AmostraDto dados){
-    this.dataHora = dados.dataHora();
-    this.endereco = new Endereco(dados.enderecoDto());
+  @PrePersist
+  public void gerarProtocolo(){
+    this.protocolo = System.currentTimeMillis();
   }
-  */
 }
 

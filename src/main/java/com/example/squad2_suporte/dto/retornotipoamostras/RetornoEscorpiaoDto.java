@@ -4,5 +4,5 @@ import com.example.squad2_suporte.dto.amostra.EnderecoDto;
 
 import java.time.LocalDateTime;
 
-public record RetornoEscorpiaoDto(Long id, LocalDateTime dataHora, EnderecoDto enderecoDto, Integer quantidade , boolean sofreuAcidente) {
+public record RetornoEscorpiaoDto(Long protocolo, LocalDateTime dataHora, EnderecoDto enderecoDto, Integer quantidade , boolean sofreuAcidente) {
 }
