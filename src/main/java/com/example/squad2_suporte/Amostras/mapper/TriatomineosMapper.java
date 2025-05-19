@@ -8,12 +8,16 @@ import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoTriatomineosDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Mapper(componentModel = "spring", uses = {EnderecoMapper.class})
 public interface TriatomineosMapper {
 
     @Mapping(target = "tipoAmostra", constant = "TRIATOMINEOS")
-    @Mapping(target = "dataHora", source = "dataHora") // herança
+    @Mapping(target = "dataHora", source = "dataHora", qualifiedByName = "removerSegundos") // herança
     @Mapping(target = "endereco", source = "enderecoDto") // usando EnderecoMapper
     Triatomineos dtoParaEntidade(TriatomineosDto dto);
 
@@ -21,6 +25,11 @@ public interface TriatomineosMapper {
     RetornoTriatomineosDto entidadeParaRetorno(Triatomineos triatomineos);
 
     TriatomineosDto fromAmostraDto(AmostraDto dto);
+
+    @Named("removerSegundos")
+    static LocalDateTime removerMiliSegundos(LocalDateTime data) {
+        return data != null ? data.truncatedTo(ChronoUnit.MINUTES) : null;
+    }
 
 }
 

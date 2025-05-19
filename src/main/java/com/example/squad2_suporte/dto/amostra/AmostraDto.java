@@ -6,11 +6,13 @@ import com.example.squad2_suporte.enuns.flebotomineos.*;
 import com.example.squad2_suporte.enuns.larva.TipoLarva;
 import com.example.squad2_suporte.enuns.molusco.TipoMolusco;
 import com.example.squad2_suporte.enuns.triatomineos.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
 public record AmostraDto(
         TipoAmostra tipoAmostra,
+        @Schema(type = "string", pattern = "yyyy-MM-dd'T'HH:mm", example = "2025-05-19T14:30")
         LocalDateTime dataHora,
         EnderecoDto enderecoDto,
         Integer quantidade,
