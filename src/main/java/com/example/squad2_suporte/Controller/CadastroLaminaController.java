@@ -6,10 +6,7 @@ import com.example.squad2_suporte.dto.lamina.RetornoLaminaDto;
 import com.example.squad2_suporte.service.LaminaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -29,5 +26,18 @@ public class CadastroLaminaController {
         var uri = uriComponentsBuilder.path("cadastro/lamina/{id}").buildAndExpand(novaLamina.getId()).toUri();
 
         return ResponseEntity.created(uri).body(laminaMapper.entidadeParaRetorno(novaLamina)); // 201 CREATED
+    }
+
+    @DeleteMapping("/{protocolo}")
+    public ResponseEntity<String> removerLamina(@PathVariable Long protocolo) {
+        laminaService.deletarLamina(protocolo);
+        return ResponseEntity.ok("Lamina removida!");
+    }
+
+    @GetMapping("/{protocolo}")
+    public ResponseEntity<RetornoLaminaDto> buscarLamina(@PathVariable Long protocolo){
+        var lamina = laminaService.buscarLamina(protocolo);
+
+        return ResponseEntity.ok(laminaMapper.entidadeParaRetorno(lamina));
     }
 }
