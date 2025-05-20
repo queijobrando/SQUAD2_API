@@ -3,7 +3,9 @@ package com.example.squad2_suporte.Amostras.mapper;
 import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.enviotipoamostras.*;
+import com.example.squad2_suporte.dto.lote.LoteProtocoloDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.*;
+import com.example.squad2_suporte.lote.Lote;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -21,6 +23,7 @@ public interface TipoAmostraMapper {
     Escorpioes escorpiaoDtoParaEntidade(EscorpiaoDto dto);
 
     @Mapping(target = "enderecoDto", source = "endereco")
+    @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
     RetornoEscorpiaoDto escorpiaoEntidadeParaRetorno(Escorpioes escorpioes);
 
     EscorpiaoDto escorpiaoFromAmostraDto(AmostraDto dto);
@@ -32,6 +35,7 @@ public interface TipoAmostraMapper {
     Flebotomineos flebotomineosDtoParaEntidade(FlebotomineosDto dto);
 
     @Mapping(target = "enderecoDto", source = "endereco")
+    @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
     RetornoFlebotomineosDto flebotomineosEntidadeParaRetorno(Flebotomineos flebotomineos);
 
     FlebotomineosDto flebotomineosFromAmostraDto(AmostraDto dto);
@@ -43,6 +47,7 @@ public interface TipoAmostraMapper {
     Triatomineos triatomineosDtoParaEntidade(TriatomineosDto dto);
 
     @Mapping(target = "enderecoDto", source = "endereco")
+    @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
     RetornoTriatomineosDto triatomieosEntidadeParaRetorno(Triatomineos triatomineos);
 
     TriatomineosDto triatomineosFromAmostraDto(AmostraDto dto);
@@ -54,6 +59,7 @@ public interface TipoAmostraMapper {
     Molusco moluscoDtoParaEntidade(MoluscoDto moluscoDto);
 
     @Mapping(target = "enderecoDto", source = "endereco")
+    @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
     RetornoMoluscoDto moluscoEntidadeParaRetorno(Molusco molusco);
 
     MoluscoDto moluscoFromAmostraDto(AmostraDto amostraDto);
@@ -65,6 +71,7 @@ public interface TipoAmostraMapper {
     Larvas larvasDtoParaEntidade(LarvasDto larvasDto);
 
     @Mapping(target = "enderecoDto", source = "endereco")
+    @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
     RetornoLarvasDto larvasEntidadeParaRetorno(Larvas larvas);
 
     LarvasDto larvasFromAmostraDto(AmostraDto amostraDto);
@@ -73,5 +80,10 @@ public interface TipoAmostraMapper {
     @Named("removerSegundos")
     static LocalDateTime removerMiliSegundos(LocalDateTime data) {
         return data != null ? data.truncatedTo(ChronoUnit.MINUTES) : null;
+    }
+
+    @Named("mapearLoteParaProtocolo")
+    static LoteProtocoloDto mapearLoteParaProtocolo(Lote lote) {
+        return lote != null ? new LoteProtocoloDto(lote.getProtocolo()) : null;
     }
 }
