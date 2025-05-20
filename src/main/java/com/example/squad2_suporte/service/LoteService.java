@@ -1,7 +1,9 @@
 package com.example.squad2_suporte.service;
 
 import com.example.squad2_suporte.Amostras.Amostra;
+import com.example.squad2_suporte.Amostras.mapper.LoteMapper;
 import com.example.squad2_suporte.dto.lote.LoteDto;
+import com.example.squad2_suporte.dto.lote.RetornoLoteDto;
 import com.example.squad2_suporte.lote.Lote;
 import com.example.squad2_suporte.repositorios.AmostraRepository;
 import com.example.squad2_suporte.repositorios.LoteRepository;
@@ -18,6 +20,9 @@ public class LoteService {
 
     @Autowired
     private AmostraRepository amostraRepository;
+
+    @Autowired
+    private LoteMapper loteMapper;
 
     public Lote cadastrarLote(LoteDto loteDto){
         if (loteDto.protocoloAmostras() == null || loteDto.protocoloAmostras().isEmpty()){
@@ -46,6 +51,12 @@ public class LoteService {
         }
 
         return loteRepository.save(lote);
+    }
+
+    public List<RetornoLoteDto> listarLotes() {
+        return loteRepository.findAll().stream()
+                .map(loteMapper::entidadeParaRetorno)
+                .toList();
     }
 
 }
