@@ -23,4 +23,22 @@ public class LaminaService {
         Lamina lamina = laminaMapper.dtoParaEntidade(laminaDto);
         return laminaRepository.save(lamina);
     }
+
+    public void deletarLamina(Long protocolo) {
+        var lamina = laminaRepository.findByProtocolo(protocolo);
+        if (lamina == null){
+            throw new RuntimeException("Protocolo inválido ou inexistente");
+        } else {
+            laminaRepository.delete(lamina);
+        }
+    }
+
+    public Lamina buscarLamina(Long protocolo){
+        var lamina = laminaRepository.findByProtocolo(protocolo);
+        if (lamina == null){
+            throw new RuntimeException("Protocolo inválido ou inexistente");
+        } else {
+            return lamina;
+        }
+    }
 }

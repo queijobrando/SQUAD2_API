@@ -1,6 +1,7 @@
 package com.example.squad2_suporte.Lamina;
 
 import com.example.squad2_suporte.Classes.*;
+import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
@@ -27,14 +28,19 @@ public class Lamina {
     @Column(nullable = false)
     private LocalDateTime data;
 
+    @Column(unique = true)
+    private Long protocolo;
+
     @Column(nullable = false)
     private Integer numeroOvos;
 
     private String resultado;
 
     @PrePersist
-    public void definirDataHoraCriacao() {
+    public void geracaoAutomatica() {
         this.data = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS); // define a data/hora/segundos que for cadastrada
+        this.protocolo = System.currentTimeMillis();
     }
+
 
 }
