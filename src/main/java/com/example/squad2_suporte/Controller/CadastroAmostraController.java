@@ -9,12 +9,14 @@ import com.example.squad2_suporte.dto.enviotipoamostras.FlebotomineosDto;
 import com.example.squad2_suporte.dto.enviotipoamostras.TriatomineosDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoFlebotomineosDto;
+import com.example.squad2_suporte.dto.retornotipoamostras.RetornoIdAmostras;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoTriatomineosDto;
 import com.example.squad2_suporte.service.AmostraService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("cadastro/amostra")
@@ -24,9 +26,14 @@ public class CadastroAmostraController {
     private AmostraService amostraService;
 
     @PostMapping
-    public ResponseEntity<?> cadastrarAmostra(@RequestBody AmostraDto dto) {
-        var resposta = amostraService.cadastrarAmostraUnificada(dto);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<?> cadastrarAmostra(@RequestBody AmostraDto dto, UriComponentsBuilder uriComponentsBuilder) {
+        var amostra = amostraService.cadastrarAmostraUnificada(dto);
+
+        Long id = ((RetornoIdAmostras) amostra).id();
+
+        var uri = uriComponentsBuilder.path("cadastro/amostra/{id}").buildAndExpand(id).toUri();
+
+        return ResponseEntity.created(uri).body(amostra); // 201 created
     }
 
     @DeleteMapping("/{protocolo}")
