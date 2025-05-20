@@ -5,6 +5,7 @@ import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.enuns.TipoAmostra;
+import com.example.squad2_suporte.lote.Lote;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -57,6 +58,11 @@ public abstract class Amostra {
   @Enumerated(EnumType.STRING)
   @JsonIgnore // O JsonSubTypes vai ignorar quando retornar em formato json (evitar dois campos repetidos)
   private TipoAmostra tipoAmostra; // tipo da amostra (ele é setado automaticamente no tipo correspondente)
+
+  @ManyToOne
+  @JoinColumn(name = "lote_id") // Amostra pode ou não ter um lote
+  @JsonIgnore
+  private Lote lote;
 
   @PrePersist
   public void gerarProtocolo(){
