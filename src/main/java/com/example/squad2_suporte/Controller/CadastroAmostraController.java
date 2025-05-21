@@ -25,6 +25,7 @@ public class CadastroAmostraController {
     @Autowired
     private AmostraService amostraService;
 
+    @Operation(summary = "Cadastrar uma Amostra", description = "Metodo para cadastrar uma nova amostra", tags = "Gerenciar Amostras")
     @PostMapping
     public ResponseEntity<?> cadastrarAmostra(@RequestBody AmostraDto dto, UriComponentsBuilder uriComponentsBuilder) {
         var amostra = amostraService.cadastrarAmostraUnificada(dto);
@@ -36,12 +37,14 @@ public class CadastroAmostraController {
         return ResponseEntity.created(uri).body(amostra); // 201 created
     }
 
+    @Operation(summary = "Deletar Amostra", description = "Metodo para deletar uma amostra existente pelo numero do protocolo", tags = "Gerenciar Amostras")
     @DeleteMapping("/{protocolo}")
     public ResponseEntity<String> removerAmostra(@PathVariable Long protocolo) {
         amostraService.deletarAmostra(protocolo);
         return ResponseEntity.ok("Amostra removida!");
     }
 
+    @Operation(summary = "Buscar Amostra", description = "Metodo para buscar e exibir informações de uma amostra", tags = "Gerenciar Amostras")
     @GetMapping("/{protocolo}")
     public ResponseEntity<?> buscarAmostra(@PathVariable Long protocolo){
         var amostra = amostraService.buscarAmostra(protocolo);
