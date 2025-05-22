@@ -1,6 +1,7 @@
 package com.example.squad2_suporte.Controller;
 
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
+import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoIdAmostras;
 import com.example.squad2_suporte.service.AmostraService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("cadastro/amostra")
+@RequestMapping("gerenciar/amostra")
 public class CadastroAmostraController {
 
     @Autowired
@@ -37,8 +40,10 @@ public class CadastroAmostraController {
                             "logradouro": "Rua Exemplo",
                             "numero": "123",
                             "bairro": "Centro",
+                            "cep": "87564330",
                             "cidade": "Cidade Exemplo",
-                            "estado": "SP"
+                            "municipio": "Aracaju",
+                            "complemento": "Perto de tal lugar"
                           },
                           "quantidade": 2,
                           "sofreuAcidente": false
@@ -55,8 +60,10 @@ public class CadastroAmostraController {
                             "logradouro": "Rua Exemplo",
                             "numero": "123",
                             "bairro": "Centro",
+                            "cep": "87564330",
                             "cidade": "Cidade Exemplo",
-                            "estado": "SP"
+                            "municipio": "Aracaju",
+                            "complemento": "Perto de tal lugar"
                           },
                           "classificacaoAreaLT": "SURTO",
                           "classificacaoAreaLV": "VULNERAVELNRECEPTIVO",
@@ -94,8 +101,10 @@ public class CadastroAmostraController {
                             "logradouro": "Rua Exemplo",
                             "numero": "123",
                             "bairro": "Centro",
+                            "cep": "87564330",
                             "cidade": "Cidade Exemplo",
-                            "estado": "SP"
+                            "municipio": "Aracaju",
+                            "complemento": "Perto de tal lugar"
                           },
                           "numLarvas": 20,
                           "tipoLarva": "A_EGYPYTI",
@@ -113,8 +122,10 @@ public class CadastroAmostraController {
                             "logradouro": "Rua Exemplo",
                             "numero": "123",
                             "bairro": "Centro",
+                            "cep": "87564330",
                             "cidade": "Cidade Exemplo",
-                            "estado": "SP"
+                            "municipio": "Aracaju",
+                            "complemento": "Perto de tal lugar"
                           },
                           "colecaoHidrica": "Lagoa Azul",
                           "numMoluscos": 12,
@@ -137,8 +148,10 @@ public class CadastroAmostraController {
                             "logradouro": "Rua Exemplo",
                             "numero": "123",
                             "bairro": "Centro",
+                            "cep": "87564330",
                             "cidade": "Cidade Exemplo",
-                            "estado": "SP"
+                            "municipio": "Aracaju",
+                            "complemento": "Perto de tal lugar"
                           },
                           "peridomicilio": "SIM",
                           "intradomicilio": "NAO",
@@ -178,6 +191,14 @@ public class CadastroAmostraController {
         var amostra = amostraService.buscarAmostra(protocolo);
 
         return ResponseEntity.ok(amostra);
+    }
+
+    @Operation(summary = "Listar Amostras", description = "Metodo para buscar e exibir uma lista de amostras cadastradas", tags = "Gerenciar Amostras")
+    @GetMapping
+    public ResponseEntity<List<ProtocoloAmostraDto>> listarAmostrasCadastradas(){
+        var lista = amostraService.listarTodasAmostras();
+
+        return ResponseEntity.ok(lista);
     }
 
 }
