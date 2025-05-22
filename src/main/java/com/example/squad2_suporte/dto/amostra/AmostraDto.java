@@ -7,16 +7,18 @@ import com.example.squad2_suporte.enuns.larva.TipoLarva;
 import com.example.squad2_suporte.enuns.molusco.TipoMolusco;
 import com.example.squad2_suporte.enuns.triatomineos.*;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
 public record AmostraDto(
+        @NotNull(message = "O campo tipoAmostra é obrigatório")
         TipoAmostra tipoAmostra,
         @Schema(type = "string", pattern = "yyyy-MM-dd'T'HH:mm", example = "2025-05-19T14:30")
         LocalDateTime dataHora,
         EnderecoDto enderecoDto,
         Integer quantidade,
-        boolean sofreuAcidente,
+        Boolean sofreuAcidente,
         ClassificacaoAreaLT classificacaoAreaLT,
         ClassificacaoAreaLV classificacaoAreaLV,
         TipoAtividadeLT tipoAtividadeLT,
@@ -51,9 +53,9 @@ public record AmostraDto(
         Integer numMoluscos,
         TipoMolusco tipoMolusco,
         Integer numMortos,
-        boolean exposicaoLuz,
-        boolean esmagamentoConcha,
-        boolean disseccao,
+        Boolean exposicaoLuz,
+        Boolean esmagamentoConcha,
+        Boolean disseccao,
         Resultado resultado,
         Integer numLarvas,
         TipoLarva tipoLarva,
