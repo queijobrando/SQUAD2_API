@@ -1,10 +1,13 @@
 package com.example.squad2_suporte.Controller;
 
 import com.example.squad2_suporte.Amostras.mapper.LoteMapper;
+import com.example.squad2_suporte.dto.lote.EditarLoteDto;
 import com.example.squad2_suporte.dto.lote.LoteDto;
 import com.example.squad2_suporte.dto.lote.RetornoLoteDto;
 import com.example.squad2_suporte.service.LoteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +42,46 @@ public class GerenciarLoteController {
 
         return ResponseEntity.ok(listaLotes);
     }
+
+    @Operation(
+            summary = "Editar Lote",
+            description = "Adiciona ou remove amostras de um lote específico com base na opção fornecida.",
+            tags = "Gerenciar Lote",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Adicionar amostras",
+                                            value = """
+                    {
+                      "opcao": "ADICIONAR",
+                      "protocoloAmostras": [
+                        123, 124
+                      ]
+                    }
+                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Remover amostras",
+                                            value = """
+                    {
+                      "opcao": "REMOVER",
+                      "protocoloAmostras": [
+                        123
+                      ]
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    )
+    @PutMapping("/{protocolo}")
+    public ResponseEntity<RetornoLoteDto> editarLote(@PathVariable Long protocolo, @RequestBody EditarLoteDto dto) {
+        RetornoLoteDto lote = loteService.editarLote(dto, protocolo);
+        return ResponseEntity.ok(lote);
+    }
+
 
 }
