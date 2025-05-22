@@ -22,7 +22,7 @@ public interface LoteMapper {
             return List.of(); // ou Collections.emptyList();
         } else {
             return amostras.stream()
-                    .map(a -> new ProtocoloAmostraDto(a.getProtocolo(), a.getTipoAmostra()))
+                    .map(a -> new ProtocoloAmostraDto(a.getProtocolo(), a.getTipoAmostra(), a.getStatus()))
                     .toList();
         }
     }

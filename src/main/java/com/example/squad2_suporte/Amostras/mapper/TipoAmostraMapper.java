@@ -1,8 +1,9 @@
 package com.example.squad2_suporte.Amostras.mapper;
 
+import com.example.squad2_suporte.Amostras.Amostra;
 import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.*;
+import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
 import com.example.squad2_suporte.dto.lote.LoteProtocoloDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.*;
 import com.example.squad2_suporte.lote.Lote;
@@ -69,6 +70,8 @@ public interface TipoAmostraMapper {
     @Mapping(target = "enderecoDto", source = "endereco")
     @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
     RetornoLarvasDto larvasEntidadeParaRetorno(Larvas larvas);
+
+    ProtocoloAmostraDto listagemAmostras(Amostra amostra);
 
 
     //Metodo converter LocalDateTime

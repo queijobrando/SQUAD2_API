@@ -3,12 +3,15 @@ package com.example.squad2_suporte.service;
 import com.example.squad2_suporte.Amostras.mapper.*;
 import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
+import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
 import com.example.squad2_suporte.repositorios.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AmostraService {
@@ -124,6 +127,15 @@ public class AmostraService {
             }
         }
 
+    }
+
+    public List<ProtocoloAmostraDto> listarTodasAmostras(){
+        var lista = amostraRepository.findAll().stream().map(tipoAmostraMapper::listagemAmostras).toList();
+        if (lista.isEmpty()){
+            throw new RuntimeException("Nenhuma amostra cadastrada");
+        } else {
+            return lista;
+        }
     }
 
 
