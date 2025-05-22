@@ -3,8 +3,6 @@ package com.example.squad2_suporte.service;
 import com.example.squad2_suporte.Amostras.mapper.*;
 import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.*;
-import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import com.example.squad2_suporte.repositorios.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,11 +38,10 @@ public class AmostraService {
     public Object cadastrarAmostraUnificada(AmostraDto dto) {
         switch (dto.tipoAmostra()) {
             case ESCORPIAO -> {
-                EscorpiaoDto escorpiaoDto = tipoAmostraMapper.escorpiaoFromAmostraDto(dto);
-                Escorpioes escorpiao = tipoAmostraMapper.escorpiaoDtoParaEntidade(escorpiaoDto);
+                Escorpioes escorpiao = tipoAmostraMapper.amostraDtoParaEscorpiao(dto);
 
                 // Verificação se está esmagado
-                if (escorpiao.isSofreuAcidente()){
+                if (escorpiao.getSofreuAcidente()){
                     throw new RuntimeException("Amostras do tipo ESCORPIÃO não podem estar esmagadas.");
                 }
 
@@ -52,14 +49,12 @@ public class AmostraService {
                 return tipoAmostraMapper.escorpiaoEntidadeParaRetorno(escorpiao);
             }
             case FLEBOTOMINEOS -> {
-                FlebotomineosDto flebotomineosDto = tipoAmostraMapper.flebotomineosFromAmostraDto(dto);
-                Flebotomineos flebo = tipoAmostraMapper.flebotomineosDtoParaEntidade(flebotomineosDto);
+                Flebotomineos flebo = tipoAmostraMapper.amostraDtoParaFlebotomineos(dto);
                 amostraFlebotomineosRepository.save(flebo);
                 return tipoAmostraMapper.flebotomineosEntidadeParaRetorno(flebo);
             }
             case TRIATOMINEOS -> {
-                TriatomineosDto triatoDto = tipoAmostraMapper.triatomineosFromAmostraDto(dto);
-                Triatomineos triato = tipoAmostraMapper.triatomineosDtoParaEntidade(triatoDto);
+                Triatomineos triato = tipoAmostraMapper.amostraDtoParaTriatomineos(dto);
 
                 // Verificação da diferença entre dataHora e a atual
                 if (triato.getDataHora().isBefore(LocalDateTime.now().minusHours(48))) {
@@ -70,8 +65,7 @@ public class AmostraService {
                 return tipoAmostraMapper.triatomieosEntidadeParaRetorno(triato);
             }
             case MOLUSCO -> {
-                MoluscoDto moluscoDto = tipoAmostraMapper.moluscoFromAmostraDto(dto);
-                Molusco molusco = tipoAmostraMapper.moluscoDtoParaEntidade(moluscoDto);
+                Molusco molusco = tipoAmostraMapper.amostraDtoParaMolusco(dto);
 
                 // Verificação da diferença entre dataHora e a atual
                 if (molusco.getDataHora().isBefore(LocalDateTime.now().minusHours(12))) {
@@ -82,8 +76,7 @@ public class AmostraService {
                 return tipoAmostraMapper.moluscoEntidadeParaRetorno(molusco);
             }
             case LARVAS -> {
-                LarvasDto larvasDto = tipoAmostraMapper.larvasFromAmostraDto(dto);
-                Larvas larvas = tipoAmostraMapper.larvasDtoParaEntidade(larvasDto);
+                Larvas larvas = tipoAmostraMapper.amostraDtoParaLarva(dto);
                 amostraLarvaRepository.save(larvas);
                 return tipoAmostraMapper.larvasEntidadeParaRetorno(larvas);
             }

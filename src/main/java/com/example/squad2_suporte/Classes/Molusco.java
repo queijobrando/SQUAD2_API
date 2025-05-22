@@ -32,10 +32,10 @@ public class Molusco extends Amostra {
     private boolean exposicaoLuz;
 
     @Column(nullable = false)
-    private boolean esmagamentoConcha;
+    private Boolean esmagamentoConcha;
 
     @Column(nullable = false)
-    private boolean disseccao;
+    private Boolean disseccao;
 
     @Column(nullable = false)
     private Resultado resultado;

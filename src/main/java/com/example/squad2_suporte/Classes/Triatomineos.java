@@ -1,9 +1,6 @@
 package com.example.squad2_suporte.Classes;
 
 import com.example.squad2_suporte.Amostras.Amostra;
-import com.example.squad2_suporte.dto.amostra.AmostraDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.TriatomineosDto;
-import com.example.squad2_suporte.enuns.TipoAmostra;
 import com.example.squad2_suporte.enuns.triatomineos.*;
 import jakarta.persistence.*;
 import lombok.Getter;
