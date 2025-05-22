@@ -91,10 +91,13 @@ public class AmostraService {
         var amostra = amostraRepository.findByProtocolo(protocolo);
         if (amostra == null){
             throw new RuntimeException("Protocolo inválido ou inexistente");
-        } else {
-            amostraRepository.delete(amostra);
         }
 
+        if (amostra.getLote() != null){
+            throw new RuntimeException("A amostra com protocolo " + protocolo + " está associada a um lote e não pode ser deletada.");
+        }
+
+        amostraRepository.delete(amostra);
     }
 
     public Object buscarAmostra(Long protocolo){
