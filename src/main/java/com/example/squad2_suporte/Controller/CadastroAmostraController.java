@@ -7,6 +7,9 @@ import com.example.squad2_suporte.service.AmostraService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.springframework.http.ResponseEntity;
@@ -194,11 +197,22 @@ public class CadastroAmostraController {
     }
 
     @Operation(summary = "Listar Amostras", description = "Metodo para buscar e exibir uma lista de amostras cadastradas", tags = "Gerenciar Amostras")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de amostras retornada com sucesso", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ProtocoloAmostraDto.class)
+            )),
+            @ApiResponse(responseCode = "204", description = "Nenhuma amostra encontrada", content = @Content),
+    })
     @GetMapping
     public ResponseEntity<List<ProtocoloAmostraDto>> listarAmostrasCadastradas(){
         var lista = amostraService.listarTodasAmostras();
 
-        return ResponseEntity.ok(lista);
+        if (lista.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+
+        return ResponseEntity.ok(lista); // 200 OK com a lista
     }
 
 }
