@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("consulta")
@@ -18,11 +19,8 @@ public class ConsultaController {
     private OpcoesService opcoesService;
 
     @GetMapping("/opcoes")
-    public ResponseEntity<List<String>> listarOpcoes(@RequestParam String tipo,
-                                                     @RequestParam String chave){
-        var valores =  opcoesService.listarOpcoes(tipo, chave);
-
-        return ResponseEntity.ok(valores);
+    public ResponseEntity<Map<String, List<String>>> listarOpcoes(@RequestParam String tipo){
+        return ResponseEntity.ok(opcoesService.listarPorTipo(tipo));
     }
 
 }

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface OpcoesRepository extends JpaRepository<Opcoes, Long> {
-    List<Opcoes> findByTipoAndChave(String tipo, String chave);
+    List<Opcoes> findByTipoIgnoreCase(String tipo);
 }

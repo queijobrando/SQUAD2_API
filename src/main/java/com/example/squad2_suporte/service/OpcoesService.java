@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class OpcoesService {
@@ -13,9 +15,13 @@ public class OpcoesService {
     @Autowired
     private OpcoesRepository opcoesRepository;
 
-    public List<String> listarOpcoes(String tipo, String chave){
-        List<Opcoes> opcoes = opcoesRepository.findByTipoAndChave(tipo.toUpperCase(), chave.toUpperCase());
+    public Map<String, List<String>> listarPorTipo(String tipo) {
+        List<Opcoes> opcoes = opcoesRepository.findByTipoIgnoreCase(tipo);
 
-        return opcoes.stream().map(Opcoes::getValor).toList();
+        return opcoes.stream()
+                .collect(Collectors.groupingBy(
+                        Opcoes::getChave,
+                        Collectors.mapping(Opcoes::getValor, Collectors.toList())
+                ));
     }
 }
