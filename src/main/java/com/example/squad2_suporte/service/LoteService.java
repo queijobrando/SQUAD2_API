@@ -2,6 +2,9 @@ package com.example.squad2_suporte.service;
 
 import com.example.squad2_suporte.Amostras.Amostra;
 import com.example.squad2_suporte.Amostras.mapper.LoteMapper;
+import com.example.squad2_suporte.config.exceptions.AmostraInvalidaException;
+import com.example.squad2_suporte.config.exceptions.LoteInvalidoException;
+import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import com.example.squad2_suporte.dto.lote.EditarLoteDto;
 import com.example.squad2_suporte.dto.lote.LoteDto;
 import com.example.squad2_suporte.dto.lote.RetornoLoteDto;
@@ -29,20 +32,20 @@ public class LoteService {
     @Transactional
     public Lote cadastrarLote(LoteDto loteDto){
         if (loteDto.protocoloAmostras() == null || loteDto.protocoloAmostras().isEmpty()){
-            throw new RuntimeException("É necessário ao menos uma amostra para criar um lote!");
+            throw new LoteInvalidoException("É necessário ao menos uma amostra para criar um lote!");
         }
 
         // Cria uma lista de amostras com base no id fornecido no dto
         List<Amostra> listaAmostras = amostraRepository.findAllByProtocoloIn(loteDto.protocoloAmostras());
 
         if (listaAmostras.size() != loteDto.protocoloAmostras().size()){
-            throw new RuntimeException("Alguma amostra não foi encontrada");
+            throw new RequisicaoInvalidaException("Alguma amostra não foi encontrada");
         }
 
         // Verifica se a alguma amostra ja tem lote
         for (Amostra amostra : listaAmostras){
             if (amostra.getLote() != null){
-                throw new RuntimeException("A amostra com protocolo " + amostra.getProtocolo() + " já possui um lote cadastrado!");
+                throw new AmostraInvalidaException("A amostra com protocolo " + amostra.getProtocolo() + " já possui um lote cadastrado!");
             }
         }
 
@@ -65,18 +68,18 @@ public class LoteService {
     @Transactional
     public RetornoLoteDto editarLote(EditarLoteDto dto, Long loteProtocolo){
         if (dto.protocoloAmostras() == null || dto.protocoloAmostras().isEmpty()){
-            throw new RuntimeException("É necessário ao menos uma amostra para editar um lote!");
+            throw new LoteInvalidoException("É necessário ao menos uma amostra para editar um lote!");
         }
 
         List<Amostra> listaAmostras = amostraRepository.findAllByProtocoloIn(dto.protocoloAmostras());
 
         if (listaAmostras.size() != dto.protocoloAmostras().size()){
-            throw new RuntimeException("Alguma amostra não foi encontrada");
+            throw new RequisicaoInvalidaException("Alguma amostra não foi encontrada");
         }
 
         Lote lote = loteRepository.findByProtocolo(loteProtocolo);
         if (lote == null) {
-            throw new RuntimeException("Lote com protocolo " + loteProtocolo + " não encontrado");
+            throw new RequisicaoInvalidaException("Lote com protocolo " + loteProtocolo + " não encontrado");
         }
 
         switch (dto.opcao()){
@@ -84,7 +87,7 @@ public class LoteService {
                 // Verifica se a alguma amostra ja tem lote
                 for (Amostra amostra : listaAmostras){
                     if (amostra.getLote() != null){
-                        throw new RuntimeException("A amostra com protocolo " + amostra.getProtocolo() + " já possui um lote cadastrado!");
+                        throw new AmostraInvalidaException("A amostra com protocolo " + amostra.getProtocolo() + " já possui um lote cadastrado!");
                     }
                     amostra.setLote(lote);
                     lote.getAmostras().add(amostra);
@@ -94,14 +97,14 @@ public class LoteService {
                 // Verifica se a alguma amostra ja tem lote
                 for (Amostra amostra : listaAmostras){
                     if (!lote.equals((amostra.getLote()))){
-                        throw new RuntimeException("A amostra com protocolo " + amostra.getProtocolo() + "não pertence a este lote!");
+                        throw new AmostraInvalidaException("A amostra com protocolo " + amostra.getProtocolo() + "não pertence a este lote!");
                     }
                     amostra.setLote(null);
                     lote.getAmostras().remove(amostra);
                 }
 
             }
-            default -> throw new IllegalArgumentException("Opção Inválida: " + dto.opcao());
+            default -> throw new RequisicaoInvalidaException("Opção Inválida: " + dto.opcao());
         }
 
         return loteMapper.entidadeParaRetorno(lote);

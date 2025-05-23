@@ -40,6 +40,10 @@ public class GerenciarLoteController {
     public ResponseEntity<List<RetornoLoteDto>> listarLotes(){
         var listaLotes = loteService.listarLotes();
 
+        if (listaLotes.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+
         return ResponseEntity.ok(listaLotes);
     }
 

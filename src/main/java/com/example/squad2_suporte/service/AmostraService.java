@@ -2,6 +2,9 @@ package com.example.squad2_suporte.service;
 
 import com.example.squad2_suporte.Amostras.mapper.*;
 import com.example.squad2_suporte.Classes.*;
+import com.example.squad2_suporte.config.exceptions.AmostraInvalidaException;
+import com.example.squad2_suporte.config.exceptions.RecursoNaoEncontradoException;
+import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
 import com.example.squad2_suporte.repositorios.*;
@@ -45,7 +48,7 @@ public class AmostraService {
 
                 // Verificação se está esmagado
                 if (escorpiao.getSofreuAcidente()){
-                    throw new RuntimeException("Amostras do tipo ESCORPIÃO não podem estar esmagadas.");
+                    throw new AmostraInvalidaException("Amostras do tipo ESCORPIÃO não podem estar esmagadas.");
                 }
 
                 amostraEscorpiaoRepository.save(escorpiao);
@@ -61,7 +64,7 @@ public class AmostraService {
 
                 // Verificação da diferença entre dataHora e a atual
                 if (triato.getDataHora().isBefore(LocalDateTime.now().minusHours(48))) {
-                    throw new RuntimeException("Amostras do tipo MOLUSCO não podem ter mais de 48 horas desde a coleta.");
+                    throw new AmostraInvalidaException("Amostras do tipo TRIATOMINEOS não podem ter mais de 48 horas desde a coleta.");
                 }
 
                 amostraTriatomineosRepository.save(triato);
@@ -72,7 +75,7 @@ public class AmostraService {
 
                 // Verificação da diferença entre dataHora e a atual
                 if (molusco.getDataHora().isBefore(LocalDateTime.now().minusHours(12))) {
-                    throw new RuntimeException("Amostras do tipo MOLUSCO não podem ter mais de 12 horas desde a coleta.");
+                    throw new AmostraInvalidaException("Amostras do tipo MOLUSCO não podem ter mais de 12 horas desde a coleta.");
                 }
 
                 amostraMoluscoRepository.save(molusco);
@@ -83,18 +86,18 @@ public class AmostraService {
                 amostraLarvaRepository.save(larvas);
                 return tipoAmostraMapper.larvasEntidadeParaRetorno(larvas);
             }
-            default -> throw new IllegalArgumentException("Tipo de amostra inválido: " + dto.tipoAmostra());
+            default -> throw new RequisicaoInvalidaException("Tipo de amostra inválido: " + dto.tipoAmostra());
         }
     }
 
     public void deletarAmostra(Long protocolo) {
         var amostra = amostraRepository.findByProtocolo(protocolo);
         if (amostra == null){
-            throw new RuntimeException("Protocolo inválido ou inexistente");
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
         }
 
         if (amostra.getLote() != null){
-            throw new RuntimeException("A amostra com protocolo " + protocolo + " está associada a um lote e não pode ser deletada.");
+            throw new RequisicaoInvalidaException("A amostra com protocolo " + protocolo + " está associada a um lote e não pode ser deletada.");
         }
 
         amostraRepository.delete(amostra);
@@ -103,7 +106,7 @@ public class AmostraService {
     public Object buscarAmostra(Long protocolo){
         var amostra = amostraRepository.findByProtocolo(protocolo);
         if (amostra == null){
-            throw new RuntimeException("Protocolo inválido ou inexistente");
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
         } else {
             switch (amostra.getTipoAmostra()){
                 case ESCORPIAO -> {
@@ -126,19 +129,14 @@ public class AmostraService {
                     Molusco molusco = amostraMoluscoRepository.findByProtocolo(protocolo);
                     return tipoAmostraMapper.moluscoEntidadeParaRetorno(molusco);
                 }
-                default -> throw new IllegalArgumentException("Amostra não encontrada");
+                default -> throw new RecursoNaoEncontradoException("Tipo de amostra não encontrada");
             }
         }
 
     }
 
     public List<ProtocoloAmostraDto> listarTodasAmostras(){
-        var lista = amostraRepository.findAll().stream().map(tipoAmostraMapper::listagemAmostras).toList();
-        if (lista.isEmpty()){
-            throw new RuntimeException("Nenhuma amostra cadastrada");
-        } else {
-            return lista;
-        }
+        return amostraRepository.findAll().stream().map(tipoAmostraMapper::listagemAmostras).toList();
     }
 
 
