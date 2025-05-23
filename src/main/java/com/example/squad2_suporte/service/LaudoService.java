@@ -16,7 +16,7 @@ public class LaudoService {
 
     public Laudo salvar(MultipartFile arquivo) throws Exception {
 
-        if (arquivo.isEmpty()||arquivo.getContentType().equalsIgnoreCase("application/pdf")) {
+        if (arquivo.isEmpty() || !arquivo.getContentType().equalsIgnoreCase("application/pdf")) {
             throw new IllegalArgumentException("Tipo de arquivo não suportado.");
         }
 
