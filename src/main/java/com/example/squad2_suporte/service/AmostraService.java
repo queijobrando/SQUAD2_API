@@ -64,7 +64,7 @@ public class AmostraService {
 
                 // Verificação da diferença entre dataHora e a atual
                 if (triato.getDataHora().isBefore(LocalDateTime.now().minusHours(48))) {
-                    throw new AmostraInvalidaException("Amostras do tipo MOLUSCO não podem ter mais de 48 horas desde a coleta.");
+                    throw new AmostraInvalidaException("Amostras do tipo TRIATOMINEOS não podem ter mais de 48 horas desde a coleta.");
                 }
 
                 amostraTriatomineosRepository.save(triato);
@@ -129,7 +129,7 @@ public class AmostraService {
                     Molusco molusco = amostraMoluscoRepository.findByProtocolo(protocolo);
                     return tipoAmostraMapper.moluscoEntidadeParaRetorno(molusco);
                 }
-                default -> throw new RequisicaoInvalidaException("Amostra não encontrada");
+                default -> throw new RecursoNaoEncontradoException("Tipo de amostra não encontrada");
             }
         }
 

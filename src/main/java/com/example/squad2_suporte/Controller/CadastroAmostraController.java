@@ -1,7 +1,9 @@
 package com.example.squad2_suporte.Controller;
 
+import com.example.squad2_suporte.config.RestErrorMessage;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
+import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoIdAmostras;
 import com.example.squad2_suporte.service.AmostraService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -170,6 +172,77 @@ public class CadastroAmostraController {
                     )
             )
     )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Amostra criada com sucesso",
+                    content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = RetornoEscorpiaoDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Erro de validação ou dados inválidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Erro 400 - Amostra ESCORPIAO inválida",
+                                            value = """
+                                            {
+                                              "mensagem": "Amostras do tipo ESCORPIÃO não podem estar esmagadas",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                        """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Erro 400 - Amostra TRIATOMINEO inválida",
+                                            value = """
+                                            {
+                                              "mensagem": "Amostras do tipo TRIATOMINEOS não podem ter mais de 48 horas desde a coleta",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                        """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Erro 400 - Amostra MOLUSCO inválida",
+                                            value = """
+                                            {
+                                              "mensagem": "Amostras do tipo MOLUSCO não podem ter mais de 12 horas desde a coleta",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                        """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Erro 400 - Requisição inválida",
+                                            value = """
+                                            {
+                                              "mensagem": "Tipo de amostra inválida",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                        """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Erro 500",
+                                    value = """
+                    {
+                      "mensagem": "Erro inesperado ao cadastrar amostra",
+                      "status": "INTERNAL_SERVER_ERROR"
+                    }
+                """
+                            )
+                    )
+            )
+    })
     @PostMapping
     public ResponseEntity<?> cadastrarAmostra(@org.springframework.web.bind.annotation.RequestBody AmostraDto dto, UriComponentsBuilder uriComponentsBuilder) {
         var amostra = amostraService.cadastrarAmostraUnificada(dto);
@@ -181,6 +254,53 @@ public class CadastroAmostraController {
         return ResponseEntity.created(uri).body(amostra); // 201 created
     }
 
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Amostra deletada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(example = "Amostra removida!")
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Protocolo inválido ou não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Erro 404 - Protocolo inválido ou inexistente",
+                                            value = """
+                                            {
+                                              "mensagem": "Protocolo inválido ou inexistente",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                        """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Amostra está associada a um lote e não pode ser deletada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Erro 400 - Requisição inválida",
+                                            value = """
+                                            {
+                                              "mensagem": "A amostra AMOSTRA está associada a um lote e não pode ser deletada",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                        """
+                                    )
+                            }
+                    )
+            )
+    })
     @Operation(summary = "Deletar Amostra", description = "Metodo para deletar uma amostra existente pelo numero do protocolo", tags = "Gerenciar Amostras")
     @DeleteMapping("/{protocolo}")
     public ResponseEntity<String> removerAmostra(@PathVariable Long protocolo) {
@@ -188,6 +308,44 @@ public class CadastroAmostraController {
         return ResponseEntity.ok("Amostra removida!");
     }
 
+
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Amostra retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RetornoEscorpiaoDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Protocolo ou tipo de amostra inválidos ou não encontrados",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Erro 404 - Protocolo inválido ou inexistente",
+                                            value = """
+                                            {
+                                              "mensagem": "Protocolo inválido ou inexistente",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                        """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Erro 404 - Tipo de amostra não encontrada",
+                                            value = """
+                                            {
+                                              "mensagem": "Tipo de amostra não encontrada",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                        """
+                                    )
+                            }
+                    )
+            )
+    })
     @Operation(summary = "Buscar Amostra", description = "Metodo para buscar e exibir informações de uma amostra", tags = "Gerenciar Amostras")
     @GetMapping("/{protocolo}")
     public ResponseEntity<?> buscarAmostra(@PathVariable Long protocolo){
