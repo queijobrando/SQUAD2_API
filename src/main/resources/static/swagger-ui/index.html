@@ -1,0 +1,2253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API LACEN - Fundação de Saúde Parreiras Horta</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #1e3a8a;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Header superior com informações de contato */
+        .top-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 0.75rem 0;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .top-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .contact-item i {
+            font-size: 0.9rem;
+            color: #fbbf24;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #fbbf24;
+        }
+
+        /* Header principal */
+        .main-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .main-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, #fbbf24 33%, #10b981 33%, #10b981 66%, #dbeafe 66%);
+        }
+
+        .main-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo-fsph img {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo-sergipe {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-item i {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #fbbf24;
+        }
+
+        .auth-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            min-width: 300px;
+        }
+
+        .server-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .server-select:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .server-select option {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        .auth-btn, .links-btn {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .auth-btn {
+            background: #ffffff;
+            color: #1e3a8a;
+            border: 2px solid #1e3a8a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-btn:hover {
+            background: #1e3a8a;
+            color: #fbbf24;
+            border-color: #fbbf24;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .links-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .links-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: scale(0);
+            animation: rippleEffect 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: #1e3a8a;
+            color: white;
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+
+        .version-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #fbbf24;
+            color: #1e3a8a;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin: -4rem auto 4rem;
+            max-width: 1200px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(30,58,138,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-color: rgba(30,58,138,0.3);
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem 1.2rem 1.2rem 3.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 1.2rem;
+        }
+
+        /* Controller Sections */
+        .controller-section {
+            margin-bottom: 2.5rem;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .controller-header {
+            padding: 1.8rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .controller-header:hover {
+            background: #f1f5f9;
+        }
+
+        .controller-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .controller-icon {
+            font-size: 1.3rem;
+            color: #64748b;
+            transition: transform 0.4s ease;
+        }
+
+        .controller-section.expanded .controller-icon {
+            transform: rotate(180deg);
+        }
+
+        .controller-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+
+        .controller-section.expanded .controller-content {
+            max-height: 2000px;
+        }
+
+        .endpoints-grid {
+            display: grid;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .endpoint-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(30,58,138,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            transform: translateY(-3px);
+            border-color: rgba(30,58,138,0.3);
+        }
+
+        .endpoint-header {
+            padding: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.3s ease;
+        }
+
+        .endpoint-header:hover {
+            background: #f1f5f9;
+        }
+
+        .endpoint-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .endpoint-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .endpoint-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 0.3rem;
+        }
+
+        .method-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .method-get { 
+            background: #dbeafe; 
+            color: #1e40af;
+        }
+        .method-post { 
+            background: #dcfce7; 
+            color: #166534;
+        }
+        .method-put { 
+            background: #fef3c7; 
+            color: #92400e;
+        }
+        .method-delete { 
+            background: #fee2e2; 
+            color: #dc2626;
+        }
+
+        .expand-icon {
+            font-size: 1.3rem;
+            color: #64748b;
+            transition: transform 0.4s ease;
+        }
+
+        .endpoint-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .endpoint-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+
+        .endpoint-card.expanded .endpoint-content {
+            max-height: 2000px;
+        }
+
+        .endpoint-details {
+            padding: 2rem;
+            background: white;
+        }
+
+        .endpoint-url {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #1e3a8a;
+            color: #1e293b;
+        }
+
+        .endpoint-details p {
+            color: #475569;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: #1e3a8a;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #f8fafc;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+        }
+
+        /* Schemas Section */
+        .schemas-section {
+            background: #ffffff;
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            margin: 3rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .schemas-section h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .schemas-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: #1e3a8a;
+            border-radius: 2px;
+        }
+
+        .schemas-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .schema-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.2rem;
+            border-left: 4px solid #1e3a8a;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .schema-card:hover {
+            background: #f1f5f9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .schema-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .schema-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .schema-type {
+            font-size: 0.85rem;
+            color: #64748b;
+            background: #e2e8f0;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+        }
+
+        .schema-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .schema-card.expanded .schema-content {
+            max-height: 600px;
+        }
+
+        .schema-description {
+            color: #475569;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+
+        .schema-properties-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .schema-properties-table th, .schema-properties-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .schema-properties-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .schema-properties-table td {
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .schema-properties-table td:first-child {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .close {
+            color: #64748b;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #dc2626;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .auth-form label {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .auth-form input {
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+
+        .auth-form button {
+            background: #1e3a8a;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-form button:hover {
+            background: #14307d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Estilos para Test Interface */
+        .test-interface {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .test-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .test-section label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .test-section input, .test-section textarea, .test-section select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+
+        .test-section textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .test-section input:focus, .test-section textarea:focus, .test-section select:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+
+        .test-url {
+            font-family: 'Courier New', monospace;
+            background: #1e293b;
+            color: #10b981;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .response-area {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            min-height: 200px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .response-meta {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .response-meta p {
+            margin: 0;
+            color: #475569;
+        }
+
+        /* Schema Details */
+        .schema-details-section {
+            margin-top: 1.5rem;
+        }
+
+        .schema-details-section h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .schema-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .schema-details-table th, .schema-details-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .schema-details-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+
+        .schema-details-table td {
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .schema-details-table td:first-child {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .example-json {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
+            transform: translateX(100%);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: #1e3a8a;
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #f59e0b;
+        }
+
+        .footer-info {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .top-header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .auth-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+                min-width: auto;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 2% auto;
+                padding: 1.5rem;
+            }
+
+            .schemas-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animações */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header superior com informações de contato -->
+    <div class="top-header">
+        <div class="top-header-content">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+55 79 3234-6010</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ouvidoria.fsph@fsph.se.gov.br</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Av. Prof. José Bonifácio Fortes Neto, 400 - Aracaju/SE</span>
+                </div>
+            </div>
+            <button class="close-btn" onclick="closeTopHeader()" aria-label="Fechar informações de contato" title="Fechar informações de contato">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Header principal -->
+    <header class="main-header">
+        <div class="main-header-content">
+            <div class="logo-section">
+                <div class="logo-fsph">
+                    <img src="https://fsph.se.gov.br/assets/img/fsph_logoLAzul.png" alt="FSPH Logo">
+                </div>
+                <div class="logo-sergipe">SE</div>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="https://fsph.se.gov.br/about.html" target="_blank" rel="noopener" class="nav-item"><i class="fas fa-building"></i> FUNDAÇÃO</a>
+                <a href="#" class="nav-item active"><i class="fas fa-code"></i> API LACEN</a>
+                <a href="https://fsph.se.gov.br/blog.html" target="_blank" rel="noopener" class="nav-item"><i class="fas fa-newspaper"></i> NOTÍCIAS</a>
+                <a href="https://fsph.se.gov.br/institucional.html" target="_blank" rel="noopener" class="nav-item"><i class="fas fa-file-alt"></i> TRANSPARÊNCIA</a>
+            </nav>
+
+            <div class="auth-controls">
+                <label for="serverSelect" class="visually-hidden">Selecionar servidor da API</label>
+                <select class="server-select" id="serverSelect" title="Selecionar servidor da API" onchange="updateBaseUrl()">
+                    <option value="local">API - Servidor local</option>
+                    <option value="dev">API - Desenvolvimento</option>
+                    <option value="prod">API - Produção</option>
+                </select>
+                <button class="auth-btn" onclick="openAuthModal()"><i class="fas fa-lock"></i> Authorize</button>
+                <button class="links-btn" onclick="showUsefulLinks()"><i class="fas fa-link"></i> LINKS ÚTEIS</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="version-info">
+                    <i class="fas fa-code"></i>
+                    <span>API LACEN v1.0.0 - OAS 3.0</span>
+                </div>
+                <h1 class="hero-title slide-in">API LACEN</h1>
+                <p class="hero-subtitle slide-in">
+                    Sistema de gerenciamento de amostras biológicas coletadas pelos municípios e enviadas ao LACEN
+                </p>
+                <a href="#controllersList" class="cta-button slide-in"><i class="fas fa-rocket"></i> Explorar a API</a>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card fade-in">
+                <div class="stat-number" id="controllerCount">0</div>
+                <div class="stat-label">Controladores</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number" id="endpointCount">0</div>
+                <div class="stat-label">Endpoints</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number" id="modelCount">0</div>
+                <div class="stat-label">Modelos</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number" id="docPercentage">0</div>
+                <div class="stat-label">Documentados</div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Search Section -->
+            <div class="search-section fade-in">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" 
+                           class="search-input" 
+                           placeholder="Filtrar por tag, endpoint ou descrição..."
+                           id="searchInput">
+                </div>
+            </div>
+
+            <!-- Controller Sections (dinamicamente preenchidas) -->
+            <div id="controllersList"></div>
+
+            <!-- Schemas Section -->
+            <div class="schemas-section fade-in">
+                <h2>Schemas</h2>
+                <div class="schemas-grid" id="schemasList"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="https://fsph.se.gov.br/about.html" target="_blank" rel="noopener">Sobre</a>
+                <a href="https://fsph.se.gov.br/blog.html" target="_blank" rel="noopener">Notícias</a>
+                <a href="https://fsph.se.gov.br/institucional.html" target="_blank" rel="noopener">Transparência</a>
+            </div>
+            <div class="footer-info">
+                <p>Fundação de Saúde Parreiras Horta © 2025 | Av. Prof. José Bonifácio Fortes Neto, 400 - Aracaju/SE</p>
+                <p>Email: ouvidoria.fsph@fsph.se.gov.br | Telefone: +55 79 3234-6010</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal para Autenticação -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Autorizar Acesso</h2>
+                <span class="close" onclick="closeAuthModal()">×</span>
+            </div>
+            <div class="auth-form">
+                <label for="apiKey">Chave API:</label>
+                <input type="text" id="apiKey" placeholder="Insira sua chave API" />
+                <button onclick="submitAuth()">Autorizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Teste de Endpoints -->
+    <div id="testModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Teste de Endpoint</h2>
+                <span class="close" onclick="closeModal()">×</span>
+            </div>
+            <div class="test-interface">
+                <div class="test-section">
+                    <label>URL:</label>
+                    <div class="test-url" id="testUrl"></div>
+                </div>
+                <div class="test-section">
+                    <label>Parâmetros de Query (formato: chave=valor, um por linha):</label>
+                    <textarea id="queryParams" placeholder="id=123
+type=biological"></textarea>
+                </div>
+                <div class="test-section">
+                    <label>Headers (formato: chave: valor, um por linha):</label>
+                    <textarea id="customHeaders" placeholder="Content-Type: application/json
+Accept: application/json"></textarea>
+                </div>
+                <div class="test-section">
+                    <label>Body (JSON):</label>
+                    <textarea id="requestBody"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="executeTest()">
+                    <i class="fas fa-play"></i>
+                    Executar Teste
+                </button>
+            </div>
+            <div class="response-area" id="responseArea">
+                Clique em "Executar Teste" para ver a resposta...
+            </div>
+            <div class="response-meta" id="responseMeta" style="display: none;">
+                <p><strong>Status:</strong> <span id="responseStatus"></span></p>
+                <p><strong>Headers:</strong> <span id="responseHeaders"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Schema -->
+    <div id="schemaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Schema do Endpoint</h2>
+                <span class="close" onclick="closeSchemaModal()">×</span>
+            </div>
+            <div class="schema-details-section" id="schemaArea">
+                Carregando schema...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let baseUrl = 'http://localhost:8080';
+        let authToken = null;
+        let currentEndpoint = '';
+        let currentMethod = '';
+        let currentOperation = null;
+
+        // Funções principais
+        function toggleController(header) {
+            const section = header.closest('.controller-section');
+            section.classList.toggle('expanded');
+        }
+
+        function toggleEndpoint(header) {
+            const card = header.closest('.endpoint-card');
+            card.classList.toggle('expanded');
+        }
+
+        function toggleSchema(event) {
+            event.stopPropagation();
+            const card = event.currentTarget;
+            card.classList.toggle('expanded');
+            // Ensure only the clicked card is toggled, others remain unchanged
+            const schemas = document.querySelectorAll('.schema-card');
+            schemas.forEach(s => {
+                if (s !== card) {
+                    s.classList.remove('expanded');
+                }
+            });
+        }
+
+        function closeTopHeader() {
+            document.querySelector('.top-header').style.display = 'none';
+        }
+
+        function openAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'block';
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'none';
+        }
+
+        function submitAuth() {
+            const apiKey = document.getElementById('apiKey').value;
+            if (apiKey) {
+                authToken = apiKey;
+                closeAuthModal();
+                showNotification('Autorização bem-sucedida!', 'success');
+                document.querySelector('.auth-btn').innerHTML = '<i class="fas fa-unlock"></i> Autorizado';
+            } else {
+                showNotification('Por favor, insira uma chave API válida.', 'info');
+            }
+        }
+
+        function showUsefulLinks() {
+            showNotification('Links úteis: Em breve mais funcionalidades!', 'info');
+        }
+
+        function updateBaseUrl() {
+            const server = document.getElementById('serverSelect').value;
+            baseUrl = getBaseUrl(server);
+            showNotification(`Servidor alterado para: ${server}`, 'success');
+            renderControllers();
+        }
+
+        function getBaseUrl(server) {
+            switch(server) {
+                case 'local': return 'http://localhost:8080';
+                case 'dev': return 'https://api-dev.lacen.se.gov.br';
+                case 'prod': return 'https://api.lacen.se.gov.br';
+                default: return 'http://localhost:8080';
+            }
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const controllersList = document.getElementById('controllersList');
+
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const controllerSections = controllersList.querySelectorAll('.controller-section');
+
+            controllerSections.forEach(section => {
+                const endpoints = section.querySelectorAll('.endpoint-card');
+                let hasMatch = false;
+
+                endpoints.forEach(card => {
+                    const tags = card.dataset.tags || '';
+                    const title = card.querySelector('.endpoint-name').textContent.toLowerCase();
+                    const description = card.querySelector('.endpoint-description').textContent.toLowerCase();
+                    
+                    const isMatch = tags.includes(searchTerm) || 
+                                   title.includes(searchTerm) || 
+                                   description.includes(searchTerm);
+
+                    if (isMatch || searchTerm === '') {
+                        card.style.display = 'block';
+                        card.style.animation = 'fadeIn 0.3s ease-out';
+                        hasMatch = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                section.style.display = hasMatch || searchTerm === '' ? 'block' : 'none';
+            });
+        });
+
+        async function loadOpenAPISpec() {
+            try {
+                const headers = {
+                    'Accept': 'application/json'
+                };
+                if (authToken) {
+                    headers['Authorization'] = `Bearer ${authToken}`;
+                }
+                const response = await fetch(`${baseUrl}/v3/api-docs`, { headers });
+                return await response.json();
+            } catch (error) {
+                console.error('Erro ao carregar especificação OpenAPI:', error);
+                return null;
+            }
+        }
+
+        async function renderControllers() {
+            const controllersList = document.getElementById('controllersList');
+            const spec = await loadOpenAPISpec();
+
+            if (!spec || !spec.paths) {
+                controllersList.innerHTML = '<p>Erro ao carregar especificação OpenAPI</p>';
+                return;
+            }
+
+            const controllers = {};
+            for (const [path, methods] of Object.entries(spec.paths)) {
+                for (const [method, details] of Object.entries(methods)) {
+                    const tag = details.tags && details.tags.length > 0 ? details.tags[0] : 'default';
+                    if (!controllers[tag]) {
+                        controllers[tag] = [];
+                    }
+                    controllers[tag].push({ path, method, details });
+                }
+            }
+
+            controllersList.innerHTML = '';
+            for (const [controllerName, endpoints] of Object.entries(controllers)) {
+                const section = document.createElement('div');
+                section.className = 'controller-section fade-in';
+                section.innerHTML = `
+                    <div class="controller-header" onclick="toggleController(this)">
+                        <div class="controller-title">${controllerName}</div>
+                        <i class="fas fa-chevron-down controller-icon"></i>
+                    </div>
+                    <div class="controller-content">
+                        <div class="endpoints-grid" data-controller="${controllerName}">
+                        </div>
+                    </div>
+                `;
+
+                const endpointsGrid = section.querySelector('.endpoints-grid');
+                endpoints.forEach(({ path, method, details }) => {
+                    let parametersHtml = '';
+                    if (details.parameters) {
+                        parametersHtml += `
+                            <div class="schema-details-section">
+                                <h3>Parâmetros</h3>
+                                <table class="schema-details-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Tipo</th>
+                                            <th>Local</th>
+                                            <th>Descrição</th>
+                                            <th>Requerido</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        details.parameters.forEach(param => {
+                            parametersHtml += `
+                                <tr>
+                                    <td>${param.name}</td>
+                                    <td>${param.schema?.type || '-'}${param.schema?.format ? ` (${param.schema.format})` : ''}</td>
+                                    <td>${param.in}</td>
+                                    <td>${param.description || '-'}</td>
+                                    <td>${param.required ? 'Sim' : 'Não'}</td>
+                                </tr>
+                            `;
+                        });
+                        parametersHtml += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+
+                    let requestBodyHtml = '';
+                    if (details.requestBody) {
+                        const content = details.requestBody.content?.['application/json'];
+                        if (content) {
+                            requestBodyHtml += `
+                                <div class="schema-details-section">
+                                    <h3>Corpo da Requisição</h3>
+                                    <table class="schema-details-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Tipo</th>
+                                                <th>Descrição</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>${content.schema?.type || '-'}</td>
+                                                <td>${details.requestBody.description || '-'}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            `;
+                            if (content.example) {
+                                requestBodyHtml += `
+                                    <div class="example-json">
+                                        Exemplo:
+                                        ${JSON.stringify(content.example, null, 2)}
+                                    </div>
+                                `;
+                            } else if (content.schema?.example) {
+                                requestBodyHtml += `
+                                    <div class="example-json">
+                                        Exemplo:
+                                        ${JSON.stringify(content.schema.example, null, 2)}
+                                    </div>
+                                `;
+                            }
+                            requestBodyHtml += `</div>`;
+                        }
+                    }
+
+                    let responsesHtml = '';
+                    if (details.responses) {
+                        responsesHtml += `
+                            <div class="schema-details-section">
+                                <h3>Respostas</h3>
+                                <table class="schema-details-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Descrição</th>
+                                            <th>Tipo de Conteúdo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        for (const [code, response] of Object.entries(details.responses)) {
+                            const content = response.content?.['application/json'];
+                            responsesHtml += `
+                                <tr>
+                                    <td>${code}</td>
+                                    <td>${response.description || '-'}</td>
+                                    <td>${content ? content.schema?.type || '-' : '-'}</td>
+                                </tr>
+                            `;
+                            if (content?.example) {
+                                responsesHtml += `
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="example-json">
+                                                Exemplo (${code}):
+                                                ${JSON.stringify(content.example, null, 2)}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            } else if (content?.schema?.example) {
+                                responsesHtml += `
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="example-json">
+                                                Exemplo (${code}):
+                                                ${JSON.stringify(content.schema.example, null, 2)}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            }
+                        }
+                        responsesHtml += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'endpoint-card fade-in';
+                    card.dataset.tags = details.tags ? details.tags.join(' ') : '';
+                    card.innerHTML = `
+                        <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                            <div class="endpoint-title">
+                                <span class="method-badge method-${method.toLowerCase()}">${method.toUpperCase()}</span>
+                                <div>
+                                    <div class="endpoint-name">${details.summary || path}</div>
+                                    <div class="endpoint-description">${details.description || 'Sem descrição'}</div>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-down expand-icon"></i>
+                        </div>
+                        <div class="endpoint-content">
+                            <div class="endpoint-details">
+                                <div class="endpoint-url">${method.toUpperCase()} ${path}</div>
+                                <p>${details.description || 'Sem descrição detalhada'}</p>
+                                ${parametersHtml}
+                                ${requestBodyHtml}
+                                ${responsesHtml}
+                                <div class="action-buttons">
+                                    <button class="btn btn-primary" onclick='testEndpoint("${path}", "${method.toUpperCase()}", ${JSON.stringify(details)})'>
+                                        <i class="fas fa-play"></i>
+                                        Testar Endpoint
+                                    </button>
+                                    <button class="btn btn-secondary" onclick='viewSchema("${path}", "${method.toUpperCase()}")'>
+                                        <i class="fas fa-code"></i>
+                                        Ver Schema
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    endpointsGrid.appendChild(card);
+                });
+
+                controllersList.appendChild(section);
+            }
+
+            updateStats(spec);
+        }
+
+        async function renderSchemas() {
+            const schemasList = document.getElementById('schemasList');
+            const spec = await loadOpenAPISpec();
+
+            if (!spec || !spec.components || !spec.components.schemas) {
+                schemasList.innerHTML = '<p>Erro ao carregar schemas</p>';
+                return;
+            }
+
+            schemasList.innerHTML = '';
+            for (const [schemaName, schemaDetails] of Object.entries(spec.components.schemas)) {
+                const card = document.createElement('div');
+                card.className = 'schema-card';
+                let propertiesHtml = '';
+                if (schemaDetails.properties) {
+                    propertiesHtml += `
+                        <table class="schema-properties-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Tipo</th>
+                                    <th>Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    for (const [propName, propDetails] of Object.entries(schemaDetails.properties)) {
+                        propertiesHtml += `
+                            <tr>
+                                <td>${propName}</td>
+                                <td>${propDetails.type}${propDetails.format ? ` (${propDetails.format})` : ''}</td>
+                                <td>${propDetails.description || '-'}</td>
+                            </tr>
+                        `;
+                    }
+                    propertiesHtml += `
+                            </tbody>
+                        </table>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="schema-header">
+                        <div class="schema-name">${schemaName}</div>
+                        <div class="schema-type">${schemaDetails.type || 'Object'}</div>
+                    </div>
+                    <div class="schema-content">
+                        <div class="schema-description">${schemaDetails.description || 'Sem descrição'}</div>
+                        ${propertiesHtml}
+                    </div>
+                `;
+                card.addEventListener('click', toggleSchema);
+                schemasList.appendChild(card);
+            }
+        }
+
+        function updateStats(spec) {
+            const controllers = new Set();
+            for (const path in spec.paths) {
+                for (const method in spec.paths[path]) {
+                    const tags = spec.paths[path][method].tags || [];
+                    tags.forEach(tag => controllers.add(tag));
+                }
+            }
+            document.getElementById('controllerCount').textContent = controllers.size;
+
+            let endpointCount = 0;
+            for (const path in spec.paths) {
+                endpointCount += Object.keys(spec.paths[path]).length;
+            }
+            document.getElementById('endpointCount').textContent = endpointCount;
+
+            const modelCount = spec.components && spec.components.schemas ? Object.keys(spec.components.schemas).length : 0;
+            document.getElementById('modelCount').textContent = modelCount;
+
+            let documentedEndpoints = 0;
+            for (const path in spec.paths) {
+                for (const method in spec.paths[path]) {
+                    const endpoint = spec.paths[path][method];
+                    if (endpoint.summary || endpoint.description) {
+                        documentedEndpoints++;
+                    }
+                }
+            }
+            const docPercentage = endpointCount > 0 ? Math.round((documentedEndpoints / endpointCount) * 100) : 0;
+            document.getElementById('docPercentage').textContent = docPercentage + '%';
+        }
+
+        function testEndpoint(path, method, operation) {
+            const modal = document.getElementById('testModal');
+            const testUrl = document.getElementById('testUrl');
+            const responseArea = document.getElementById('responseArea');
+
+            currentEndpoint = path;
+            currentMethod = method;
+            currentOperation = operation;
+
+            testUrl.textContent = `${method} ${baseUrl}${path}`;
+            responseArea.textContent = 'Clique em "Executar Teste" para ver a resposta...';
+
+            // Populate query parameters
+            document.getElementById('queryParams').value = operation.parameters
+                ? operation.parameters
+                    .filter(p => p.in === 'query')
+                    .map(p => `${p.name}=${p.example || p.schema?.default || ''}`)
+                    .join('\n')
+                : '';
+
+            // Set default headers
+            document.getElementById('customHeaders').value = authToken 
+                ? `Authorization: Bearer ${authToken}\nContent-Type: application/json\nAccept: application/json` 
+                : 'Content-Type: application/json\nAccept: application/json';
+
+            // Provide default JSON body for POST, PUT, DELETE
+            let defaultBody = '';
+            if (operation.requestBody?.content?.['application/json']) {
+                const content = operation.requestBody.content['application/json'];
+                if (content.example) {
+                    defaultBody = JSON.stringify(content.example, null, 2);
+                } else if (content.schema?.example) {
+                    defaultBody = JSON.stringify(content.schema.example, null, 2);
+                } else if (content.schema?.properties) {
+                    const example = {};
+                    for (const [propName, propDetails] of Object.entries(content.schema.properties)) {
+                        if (propDetails.example) {
+                            example[propName] = propDetails.example;
+                        } else if (propDetails.default) {
+                            example[propName] = propDetails.default;
+                        } else {
+                            switch (propDetails.type) {
+                                case 'string':
+                                    example[propName] = propDetails.format === 'date-time' ? '2025-05-24T15:34:00-03:00' : 'example';
+                                    break;
+                                case 'number':
+                                case 'integer':
+                                    example[propName] = 0;
+                                    break;
+                                case 'boolean':
+                                    example[propName] = false;
+                                    break;
+                                case 'array':
+                                    example[propName] = [];
+                                    break;
+                                case 'object':
+                                    example[propName] = {};
+                                    break;
+                                default:
+                                    example[propName] = null;
+                            }
+                        }
+                    }
+                    defaultBody = JSON.stringify(example, null, 2);
+                }
+            }
+            document.getElementById('requestBody').value = defaultBody;
+
+            document.getElementById('responseMeta').style.display = 'none';
+
+            modal.style.display = 'block';
+        }
+
+        async function executeTest() {
+            const queryParams = document.getElementById('queryParams').value;
+            const customHeaders = document.getElementById('customHeaders').value;
+            const requestBody = document.getElementById('requestBody').value;
+            const responseArea = document.getElementById('responseArea');
+            const responseMeta = document.getElementById('responseMeta');
+            const responseStatus = document.getElementById('responseStatus');
+            const responseHeaders = document.getElementById('responseHeaders');
+
+            let url = `${baseUrl}${currentEndpoint}`;
+            if (queryParams) {
+                const params = queryParams.split('\n')
+                    .filter(line => line.trim())
+                    .map(line => line.split('='))
+                    .map(([key, value]) => `${encodeURIComponent(key.trim())}=${encodeURIComponent(value ? value.trim() : '')}`)
+                    .join('&');
+                if (params) {
+                    url += `?${params}`;
+                }
+            }
+
+            const headers = {};
+            if (customHeaders) {
+                customHeaders.split('\n')
+                    .filter(line => line.trim())
+                    .forEach(line => {
+                        const [key, value] = line.split(':').map(part => part.trim());
+                        if (key && value) {
+                            headers[key] = value;
+                        }
+                    });
+            }
+            headers['Accept'] = 'application/json';
+            if (authToken && !headers['Authorization']) {
+                headers['Authorization'] = `Bearer ${authToken}`;
+            }
+
+            const fetchOptions = {
+                method: currentMethod,
+                headers: headers
+            };
+
+            if (['POST', 'PUT', 'PATCH'].includes(currentMethod) && requestBody) {
+                try {
+                    const bodyJson = JSON.parse(requestBody);
+                    fetchOptions.body = JSON.stringify(bodyJson);
+                    if (!headers['Content-Type']) {
+                        headers['Content-Type'] = 'application/json';
+                    }
+                } catch (e) {
+                    responseArea.textContent = `Erro no JSON do body: ${e.message}`;
+                    return;
+                }
+            } else if (currentMethod === 'DELETE' && requestBody) {
+                try {
+                    const bodyJson = JSON.parse(requestBody);
+                    fetchOptions.body = JSON.stringify(bodyJson);
+                    if (!headers['Content-Type']) {
+                        headers['Content-Type'] = 'application/json';
+                    }
+                } catch (e) {
+                    responseArea.textContent = `Erro no JSON do body: ${e.message}`;
+                    return;
+                }
+            }
+
+            try {
+                responseArea.textContent = 'Executando...';
+                const response = await fetch(url, fetchOptions);
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    data = await response.text();
+                }
+
+                responseArea.textContent = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+                responseStatus.textContent = `${response.status} ${response.statusText}`;
+                const headersStr = Array.from(response.headers.entries())
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join('\n');
+                responseHeaders.textContent = headersStr || 'Nenhum header retornado';
+                responseMeta.style.display = 'block';
+            } catch (error) {
+                responseArea.textContent = `Erro: ${error.message}`;
+                responseMeta.style.display = 'none';
+            }
+        }
+
+        async function viewSchema(path, method) {
+            const modal = document.getElementById('schemaModal');
+            const schemaArea = document.getElementById('schemaArea');
+            const spec = await loadOpenAPISpec();
+
+            if (!spec || !spec.paths) {
+                schemaArea.innerHTML = '<p>Erro ao carregar schema</p>';
+                return;
+            }
+
+            const operation = spec.paths[path]?.[method.toLowerCase()];
+            if (!operation) {
+                schemaArea.innerHTML = '<p>Operação não encontrada</p>';
+                return;
+            }
+
+            let schemaHtml = '';
+
+            if (operation.parameters) {
+                schemaHtml += `
+                    <div class="schema-details-section">
+                        <h3>Parâmetros</h3>
+                        <table class="schema-details-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Tipo</th>
+                                    <th>Local</th>
+                                    <th>Descrição</th>
+                                    <th>Requerido</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                operation.parameters.forEach(param => {
+                    schemaHtml += `
+                        <tr>
+                            <td>${param.name}</td>
+                            <td>${param.schema?.type || '-'}${param.schema?.format ? ` (${param.schema.format})` : ''}</td>
+                            <td>${param.in}</td>
+                            <td>${param.description || '-'}</td>
+                            <td>${param.required ? 'Sim' : 'Não'}</td>
+                        </tr>
+                    `;
+                });
+                schemaHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            if (operation.requestBody) {
+                const content = operation.requestBody.content?.['application/json'];
+                if (content) {
+                    schemaHtml += `
+                        <div class="schema-details-section">
+                            <h3>Corpo da Requisição</h3>
+                            <table class="schema-details-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Descrição</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>${content.schema?.type || '-'}</td>
+                                        <td>${operation.requestBody.description || '-'}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    `;
+                    if (content.example) {
+                        schemaHtml += `
+                            <div class="example-json">
+                                Exemplo:
+                                ${JSON.stringify(content.example, null, 2)}
+                            </div>
+                        `;
+                    } else if (content.schema?.example) {
+                        schemaHtml += `
+                            <div class="example-json">
+                                Exemplo:
+                                ${JSON.stringify(content.schema.example, null, 2)}
+                            </div>
+                        `;
+                    }
+                    schemaHtml += `</div>`;
+                }
+            }
+
+            if (operation.responses) {
+                schemaHtml += `
+                    <div class="schema-details-section">
+                        <h3>Respostas</h3>
+                        <table class="schema-details-table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Descrição</th>
+                                    <th>Tipo de Conteúdo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                for (const [code, response] of Object.entries(operation.responses)) {
+                    const content = response.content?.['application/json'];
+                    schemaHtml += `
+                        <tr>
+                            <td>${code}</td>
+                            <td>${response.description || '-'}</td>
+                            <td>${content ? content.schema?.type || '-' : '-'}</td>
+                        </tr>
+                    `;
+                    if (content?.example) {
+                        schemaHtml += `
+                            <tr>
+                                <td colspan="3">
+                                    <div class="example-json">
+                                        Exemplo (${code}):
+                                        ${JSON.stringify(content.example, null, 2)}
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    } else if (content?.schema?.example) {
+                        schemaHtml += `
+                            <tr>
+                                <td colspan="3">
+                                    <div class="example-json">
+                                        Exemplo (${code}):
+                                        ${JSON.stringify(content.schema.example, null, 2)}
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                }
+                schemaHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            schemaArea.innerHTML = schemaHtml || '<p>Schema não encontrado</p>';
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('testModal').style.display = 'none';
+        }
+
+        function closeSchemaModal() {
+            document.getElementById('schemaModal').style.display = 'none';
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        window.addEventListener('click', function(event) {
+            const authModal = document.getElementById('authModal');
+            const testModal = document.getElementById('testModal');
+            const schemaModal = document.getElementById('schemaModal');
+            
+            if (event.target === authModal) {
+                closeAuthModal();
+            }
+            if (event.target === testModal) {
+                closeModal();
+            }
+            if (event.target === schemaModal) {
+                closeSchemaModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeAuthModal();
+                closeModal();
+                closeSchemaModal();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const slideElements = document.querySelectorAll('.slide-in');
+            
+            fadeElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, index * 100);
+            });
+            
+            slideElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, index * 150);
+            });
+
+            renderControllers();
+            renderSchemas();
+
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+        });
+
+        document.querySelectorAll('.btn, .auth-btn, .links-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+                this.disabled = true;
+
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = `${size}px`;
+                ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+                ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+                ripple.classList.add('ripple');
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }, 1000);
+            });
+        });
+
+        function updateStatsAnimation() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValueText = stat.textContent;
+                const finalValue = parseInt(finalValueText.replace('%', '')); // Remove o símbolo % para cálculo
+                let currentValue = 0;
+                const increment = finalValue / 20;
+                
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= finalValue) {
+                        stat.textContent = finalValueText; // Restaura o texto com %
+                        clearInterval(timer);
+                    } else {
+                        // Adiciona o símbolo % durante a animação para docPercentage
+                        if (stat.id === 'docPercentage') {
+                            stat.textContent = Math.round(currentValue) + '%';
+                        } else {
+                            stat.textContent = Math.round(currentValue);
+                        }
+                    }
+                }, 50);
+            });
+        }
+
+        // Trigger animation on stats update
+        updateStatsAnimation();
+    </script>
+</body>
+</html>
