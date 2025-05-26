@@ -1,24 +1,20 @@
 package com.example.squad2_suporte.service;
 
-import com.example.squad2_suporte.Amostras.mapper.EscorpiaoMapper;
-import com.example.squad2_suporte.Amostras.mapper.FlebotomineosMapper;
-import com.example.squad2_suporte.Amostras.mapper.TriatomineosMapper;
-import com.example.squad2_suporte.Classes.Escorpioes;
-import com.example.squad2_suporte.Classes.Flebotomineos;
-import com.example.squad2_suporte.Classes.Triatomineos;
-import com.example.squad2_suporte.dto.enviotipoamostras.EscorpiaoDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.FlebotomineosDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.TriatomineosDto;
-import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
-import com.example.squad2_suporte.dto.retornotipoamostras.RetornoFlebotomineosDto;
-import com.example.squad2_suporte.dto.retornotipoamostras.RetornoTriatomineosDto;
-import com.example.squad2_suporte.repositorios.AmostraEscorpiaoRepository;
-import com.example.squad2_suporte.repositorios.AmostraFlebotomineosRepository;
-import com.example.squad2_suporte.repositorios.AmostraRepository;
-import com.example.squad2_suporte.repositorios.AmostraTriatomineosRepository;
-import jakarta.transaction.Transactional;
+import com.example.squad2_suporte.Amostras.mapper.*;
+import com.example.squad2_suporte.Classes.*;
+import com.example.squad2_suporte.config.exceptions.AmostraInvalidaException;
+import com.example.squad2_suporte.config.exceptions.RecursoNaoEncontradoException;
+import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
+import com.example.squad2_suporte.dto.amostra.AmostraDto;
+import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
+import com.example.squad2_suporte.repositorios.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AmostraService {
@@ -36,38 +32,112 @@ public class AmostraService {
     private AmostraTriatomineosRepository amostraTriatomineosRepository;
 
     @Autowired
-    private EscorpiaoMapper escorpiaoMapper;
+    private AmostraMoluscoRepository amostraMoluscoRepository;
 
     @Autowired
-    private FlebotomineosMapper flebotomineoMapper;
+    private AmostraLarvaRepository amostraLarvaRepository;
 
     @Autowired
-    private TriatomineosMapper triatomineoMapper;
+    private TipoAmostraMapper tipoAmostraMapper;
 
     @Transactional
-    public RetornoEscorpiaoDto cadastrarAmostraEscorpioes (EscorpiaoDto dados){
-        System.out.println("rCEBENDO "+ dados.dataHora());
-        Escorpioes novaAmostra = escorpiaoMapper.dtoParaEntidade(dados);
-        System.out.println(novaAmostra.getDataHora());
-        amostraEscorpiaoRepository.save(novaAmostra);
+    public Object cadastrarAmostraUnificada(AmostraDto dto) {
+        switch (dto.tipoAmostra()) {
+            case ESCORPIAO -> {
+                Escorpioes escorpiao = tipoAmostraMapper.amostraDtoParaEscorpiao(dto);
 
-        return escorpiaoMapper.entidadeParaRetorno(novaAmostra);
+                // Verificação se está esmagado
+                if (escorpiao.getSofreuAcidente()){
+                    throw new AmostraInvalidaException("Amostras do tipo ESCORPIÃO não podem estar esmagadas.");
+                }
+
+                amostraEscorpiaoRepository.save(escorpiao);
+                return tipoAmostraMapper.escorpiaoEntidadeParaRetorno(escorpiao);
+            }
+            case FLEBOTOMINEOS -> {
+                Flebotomineos flebo = tipoAmostraMapper.amostraDtoParaFlebotomineos(dto);
+                amostraFlebotomineosRepository.save(flebo);
+                return tipoAmostraMapper.flebotomineosEntidadeParaRetorno(flebo);
+            }
+            case TRIATOMINEOS -> {
+                Triatomineos triato = tipoAmostraMapper.amostraDtoParaTriatomineos(dto);
+
+                // Verificação da diferença entre dataHora e a atual
+                if (triato.getDataHora().isBefore(LocalDateTime.now().minusHours(48))) {
+                    throw new AmostraInvalidaException("Amostras do tipo TRIATOMINEOS não podem ter mais de 48 horas desde a coleta.");
+                }
+
+                amostraTriatomineosRepository.save(triato);
+                return tipoAmostraMapper.triatomieosEntidadeParaRetorno(triato);
+            }
+            case MOLUSCO -> {
+                Molusco molusco = tipoAmostraMapper.amostraDtoParaMolusco(dto);
+
+                // Verificação da diferença entre dataHora e a atual
+                if (molusco.getDataHora().isBefore(LocalDateTime.now().minusHours(12))) {
+                    throw new AmostraInvalidaException("Amostras do tipo MOLUSCO não podem ter mais de 12 horas desde a coleta.");
+                }
+
+                amostraMoluscoRepository.save(molusco);
+                return tipoAmostraMapper.moluscoEntidadeParaRetorno(molusco);
+            }
+            case LARVAS -> {
+                Larvas larvas = tipoAmostraMapper.amostraDtoParaLarva(dto);
+                amostraLarvaRepository.save(larvas);
+                return tipoAmostraMapper.larvasEntidadeParaRetorno(larvas);
+            }
+            default -> throw new RequisicaoInvalidaException("Tipo de amostra inválido: " + dto.tipoAmostra());
+        }
     }
 
-    @Transactional
-    public RetornoFlebotomineosDto cadastrarAmostraFlebotomineos (FlebotomineosDto dados){
-        Flebotomineos novaAmostra = flebotomineoMapper.dtoParaEntidade(dados);
-        amostraFlebotomineosRepository.save(novaAmostra);
+    public void deletarAmostra(Long protocolo) {
+        var amostra = amostraRepository.findByProtocolo(protocolo);
+        if (amostra == null){
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
+        }
 
-        return flebotomineoMapper.entidadeParaRetorno(novaAmostra);
+        if (amostra.getLote() != null){
+            throw new RequisicaoInvalidaException("A amostra com protocolo " + protocolo + " está associada a um lote e não pode ser deletada.");
+        }
+
+        amostraRepository.delete(amostra);
     }
 
-    @Transactional
-    public RetornoTriatomineosDto cadastrarAmostraTriatomineos (TriatomineosDto dados){
-        Triatomineos novaAmostra = triatomineoMapper.dtoParaEntidade(dados);
-        amostraTriatomineosRepository.save(novaAmostra);
+    public Object buscarAmostra(Long protocolo){
+        var amostra = amostraRepository.findByProtocolo(protocolo);
+        if (amostra == null){
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
+        } else {
+            switch (amostra.getTipoAmostra()){
+                case ESCORPIAO -> {
+                    Escorpioes escorpioes = amostraEscorpiaoRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.escorpiaoEntidadeParaRetorno(escorpioes);
+                }
+                case FLEBOTOMINEOS -> {
+                    Flebotomineos flebo = amostraFlebotomineosRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.flebotomineosEntidadeParaRetorno(flebo);
+                }
+                case TRIATOMINEOS -> {
+                    Triatomineos triato = amostraTriatomineosRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.triatomieosEntidadeParaRetorno(triato);
+                }
+                case LARVAS -> {
+                    Larvas larvas = amostraLarvaRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.larvasEntidadeParaRetorno(larvas);
+                }
+                case MOLUSCO -> {
+                    Molusco molusco = amostraMoluscoRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.moluscoEntidadeParaRetorno(molusco);
+                }
+                default -> throw new RecursoNaoEncontradoException("Tipo de amostra não encontrada");
+            }
+        }
 
-        return triatomineoMapper.entidadeParaRetorno(novaAmostra);
     }
+
+    public List<ProtocoloAmostraDto> listarTodasAmostras(){
+        return amostraRepository.findAll().stream().map(tipoAmostraMapper::listagemAmostras).toList();
+    }
+
 
 }

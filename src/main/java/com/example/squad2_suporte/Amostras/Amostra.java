@@ -1,10 +1,11 @@
 package com.example.squad2_suporte.Amostras;
 
 import com.example.squad2_suporte.Amostras.endereco.Endereco;
-import com.example.squad2_suporte.Classes.Escorpioes;
-import com.example.squad2_suporte.Classes.Flebotomineos;
+import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
+import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.enuns.TipoAmostra;
+import com.example.squad2_suporte.lote.Lote;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -29,7 +30,10 @@ import java.time.LocalDateTime;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Escorpioes.class, name = "ESCORPIAO"),
-        @JsonSubTypes.Type(value = Flebotomineos.class, name = "FLEBOTOMINEO")
+        @JsonSubTypes.Type(value = Flebotomineos.class, name = "FLEBOTOMINEO"),
+        @JsonSubTypes.Type(value = Triatomineos.class, name = "TRIATOMINEO"),
+        @JsonSubTypes.Type(value = Molusco.class, name = "MOLUSCO"),
+        @JsonSubTypes.Type(value = Larvas.class, name = "LARVA")
 })
 public abstract class Amostra {
 
@@ -41,6 +45,13 @@ public abstract class Amostra {
   @Column(nullable = false)
   private LocalDateTime dataHora;
 
+  @Column(unique = true)
+  private Long protocolo;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private StatusAmostra status;
+
   @Embedded
   private Endereco endereco;
 
@@ -48,11 +59,15 @@ public abstract class Amostra {
   @JsonIgnore // O JsonSubTypes vai ignorar quando retornar em formato json (evitar dois campos repetidos)
   private TipoAmostra tipoAmostra; // tipo da amostra (ele é setado automaticamente no tipo correspondente)
 
-  /*
-  public Amostra(AmostraDto dados){
-    this.dataHora = dados.dataHora();
-    this.endereco = new Endereco(dados.enderecoDto());
+  @ManyToOne
+  @JoinColumn(name = "lote_id") // Amostra pode ou não ter um lote
+  @JsonIgnore
+  private Lote lote;
+
+  @PrePersist
+  public void gerarProtocolo(){
+    this.protocolo = System.currentTimeMillis();
+    this.status = StatusAmostra.PENDENTE;
   }
-  */
 }
 

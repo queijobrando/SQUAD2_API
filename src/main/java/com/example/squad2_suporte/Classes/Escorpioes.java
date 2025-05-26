@@ -1,9 +1,6 @@
 package com.example.squad2_suporte.Classes;
 
 import com.example.squad2_suporte.Amostras.Amostra;
-import com.example.squad2_suporte.dto.amostra.AmostraDto;
-import com.example.squad2_suporte.dto.enviotipoamostras.EscorpiaoDto;
-import com.example.squad2_suporte.enuns.TipoAmostra;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +15,7 @@ public class Escorpioes extends Amostra {
     private Integer quantidade;
 
     @Column(nullable = false)
-    private boolean sofreuAcidente;
+    private Boolean sofreuAcidente;
 
 
     // Adicione outros campos como colunas aqui
