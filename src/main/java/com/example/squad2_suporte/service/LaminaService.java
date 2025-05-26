@@ -2,12 +2,15 @@ package com.example.squad2_suporte.service;
 
 import com.example.squad2_suporte.Amostras.mapper.LaminaMapper;
 import com.example.squad2_suporte.Lamina.Lamina;
+import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import com.example.squad2_suporte.dto.lamina.LaminaDto;
 import com.example.squad2_suporte.dto.lamina.RetornoLaminaDto;
 import com.example.squad2_suporte.repositorios.LaminaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class LaminaService {
@@ -24,13 +27,19 @@ public class LaminaService {
         return laminaRepository.save(lamina);
     }
 
+    @Transactional
     public void deletarLamina(Long protocolo) {
         var lamina = laminaRepository.findByProtocolo(protocolo);
-        if (lamina == null){
+        if (lamina == null) {
             throw new RuntimeException("Protocolo inválido ou inexistente");
-        } else {
-            laminaRepository.delete(lamina);
         }
+
+        if (lamina.getLote() != null){
+            throw new RequisicaoInvalidaException("A lamina com protocolo " + protocolo + " está associada a um lote e não pode ser deletada.");
+        }
+
+            laminaRepository.delete(lamina);
+
     }
 
     public Lamina buscarLamina(Long protocolo){
@@ -40,5 +49,9 @@ public class LaminaService {
         } else {
             return lamina;
         }
+    }
+
+    public List<RetornoLaminaDto> listarLaminas(){
+        return laminaRepository.findAll().stream().map(laminaMapper::entidadeParaRetorno).toList();
     }
 }
