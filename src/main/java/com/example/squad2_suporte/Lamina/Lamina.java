@@ -31,6 +31,10 @@ public class Lamina {
     @Column(unique = true)
     private Long protocolo;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusAmostra status;
+
     @Column(nullable = false)
     private Integer numeroOvos;
 
@@ -40,6 +44,7 @@ public class Lamina {
     public void geracaoAutomatica() {
         this.data = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS); // define a data/hora/segundos que for cadastrada
         this.protocolo = System.currentTimeMillis();
+        this.status = StatusAmostra.PENDENTE;
     }
 
 

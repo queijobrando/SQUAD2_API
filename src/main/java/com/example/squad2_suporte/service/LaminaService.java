@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class LaminaService {
 
@@ -24,6 +26,7 @@ public class LaminaService {
         return laminaRepository.save(lamina);
     }
 
+    @Transactional
     public void deletarLamina(Long protocolo) {
         var lamina = laminaRepository.findByProtocolo(protocolo);
         if (lamina == null){
@@ -40,5 +43,9 @@ public class LaminaService {
         } else {
             return lamina;
         }
+    }
+
+    public List<RetornoLaminaDto> listarLaminas(){
+        return laminaRepository.findAll().stream().map(laminaMapper::entidadeParaRetorno).toList();
     }
 }
