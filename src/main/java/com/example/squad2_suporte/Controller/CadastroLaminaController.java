@@ -52,7 +52,7 @@ public class CadastroLaminaController {
         return ResponseEntity.ok(laminaMapper.entidadeParaRetorno(lamina));
     }
 
-    @Operation(summary = "Listar Laminas", description = "Metodo para buscar e exibir uma lista de laminas cadastradas", tags = "Gerenciar Amostras")
+    @Operation(summary = "Listar Laminas", description = "Metodo para buscar e exibir uma lista de laminas cadastradas", tags = "Gerenciar Lamina")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de laminas retornada com sucesso", content = @Content(
                     mediaType = "application/json",
