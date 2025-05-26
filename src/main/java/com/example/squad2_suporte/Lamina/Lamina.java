@@ -2,6 +2,8 @@ package com.example.squad2_suporte.Lamina;
 
 import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.enuns.StatusAmostra;
+import com.example.squad2_suporte.lote.Lote;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
@@ -34,6 +36,11 @@ public class Lamina {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusAmostra status;
+
+    @ManyToOne
+    @JoinColumn(name = "lote_id") // Amostra pode ou não ter um lote
+    @JsonIgnore
+    private Lote lote;
 
     @Column(nullable = false)
     private Integer numeroOvos;
