@@ -109,5 +109,12 @@ public class LoteService {
 
         return loteMapper.entidadeParaRetorno(lote);
     }
+    public List<RetornoLoteDto> buscarLotesPorMunicipio(String municipio) {
+        List<Lote> lotes = loteRepository.findByMunicipio(municipio);
+        return lotes.stream()
+                .map(loteMapper::entidadeParaRetorno)
+                .toList();
+    }
+
 
 }

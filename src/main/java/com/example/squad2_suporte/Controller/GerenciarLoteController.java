@@ -87,5 +87,17 @@ public class GerenciarLoteController {
         return ResponseEntity.ok(lote);
     }
 
+    @Operation(summary = "Buscar lotes por município", description = "Retorna lotes associados a amostras de um determinado município", tags = "Gerenciar Lote")
+    @GetMapping("/buscar-por-municipio")
+    public ResponseEntity<List<RetornoLoteDto>> buscarPorMunicipio(@RequestParam String municipio) {
+        List<RetornoLoteDto> lotes = loteService.buscarLotesPorMunicipio(municipio);
+
+        if (lotes.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(lotes);
+    }
+
 
 }
