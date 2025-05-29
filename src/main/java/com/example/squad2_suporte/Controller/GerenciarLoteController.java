@@ -106,6 +106,13 @@ public class GerenciarLoteController {
         return ResponseEntity.ok(lotes);
     }
 
+    @Operation(summary = "Buscar Lote", description = "Metodo para buscar lote cadastrado", tags = "Gerenciar Lote")
+    @GetMapping("/{protocolo}")
+    public ResponseEntity<RetornoLoteDto> buscarLote(@PathVariable Long protocolo){
+        var lote = loteService.buscarLote(protocolo);
+        return ResponseEntity.ok(lote);
+    }
+
     @Operation(summary = "Descartar Lote", description = "Metodo para descartar um lote", tags = "Gerenciar Lote")
     @DeleteMapping("/{protocolo}")
     public ResponseEntity<RetornoLoteDto> descartarLote(@PathVariable Long protocolo){

@@ -5,6 +5,7 @@ import com.example.squad2_suporte.Amostras.mapper.LoteMapper;
 import com.example.squad2_suporte.Lamina.Lamina;
 import com.example.squad2_suporte.config.exceptions.AmostraInvalidaException;
 import com.example.squad2_suporte.config.exceptions.LoteInvalidoException;
+import com.example.squad2_suporte.config.exceptions.RecursoNaoEncontradoException;
 import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import com.example.squad2_suporte.dto.lote.EditarLoteDto;
 import com.example.squad2_suporte.dto.lote.LoteDto;
@@ -85,6 +86,16 @@ public class LoteService {
         return loteRepository.findAll().stream()
                 .map(loteMapper::entidadeParaRetorno)
                 .toList();
+    }
+
+    public RetornoLoteDto buscarLote(Long protocolo){
+        Lote lote = loteRepository.findByProtocolo(protocolo);
+
+        if (lote == null){
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
+        }
+
+        return loteMapper.entidadeParaRetorno(lote);
     }
 
     @Transactional
