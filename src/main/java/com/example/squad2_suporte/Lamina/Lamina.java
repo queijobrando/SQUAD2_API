@@ -47,6 +47,10 @@ public class Lamina {
 
     private String resultado;
 
+    @Lob
+    @Column(columnDefinition = "BLOB")
+    private byte[] laudo;
+
     @PrePersist
     public void geracaoAutomatica() {
         this.data = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS); // define a data/hora/segundos que for cadastrada
