@@ -56,22 +56,22 @@ public class GerenciarLoteController {
                             mediaType = "application/json",
                             examples = {
                                     @ExampleObject(
-                                            name = "Adicionar amostras",
+                                            name = "Adicionar Amostra OU Lamina",
                                             value = """
                     {
                       "opcao": "ADICIONAR",
-                      "protocoloAmostras": [
+                      "protocolos": [
                         123, 124
                       ]
                     }
                     """
                                     ),
                                     @ExampleObject(
-                                            name = "Remover amostras",
+                                            name = "Remover Amostra OU Lamina",
                                             value = """
                     {
                       "opcao": "REMOVER",
-                      "protocoloAmostras": [
+                      "protocolos": [
                         123
                       ]
                     }
