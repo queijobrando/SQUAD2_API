@@ -7,6 +7,7 @@ import com.example.squad2_suporte.config.exceptions.RecursoNaoEncontradoExceptio
 import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
+import com.example.squad2_suporte.dto.amostra.ProtocoloListaAmostraDto;
 import com.example.squad2_suporte.repositorios.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -135,7 +136,7 @@ public class AmostraService {
 
     }
 
-    public List<ProtocoloAmostraDto> listarTodasAmostras(){
+    public List<ProtocoloListaAmostraDto> listarTodasAmostras(){
         return amostraRepository.findAll().stream().map(tipoAmostraMapper::listagemAmostras).toList();
     }
 
