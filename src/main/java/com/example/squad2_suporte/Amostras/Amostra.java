@@ -2,7 +2,6 @@ package com.example.squad2_suporte.Amostras;
 
 import com.example.squad2_suporte.Amostras.endereco.Endereco;
 import com.example.squad2_suporte.Classes.*;
-import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.enuns.TipoAmostra;
 import com.example.squad2_suporte.lote.Lote;
@@ -63,6 +62,10 @@ public abstract class Amostra {
   @JoinColumn(name = "lote_id") // Amostra pode ou não ter um lote
   @JsonIgnore
   private Lote lote;
+
+  @Lob
+  @Column(columnDefinition = "BLOB")
+  private byte[] laudo;
 
   @PrePersist
   public void gerarProtocolo(){
