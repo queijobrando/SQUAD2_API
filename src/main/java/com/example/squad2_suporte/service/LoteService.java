@@ -111,6 +111,10 @@ public class LoteService {
             throw new RequisicaoInvalidaException("Lote com protocolo " + loteProtocolo + " não encontrado");
         }
 
+        if (lote.getStatusLote() == StatusLote.DESCARTADO){
+            throw new LoteInvalidoException("O lote inserido já foi DESCARTADO e por isso não pode ser editado.");
+        }
+
         boolean loteContemAmostras = !lote.getAmostras().isEmpty();
         boolean loteContemLaminas = !lote.getLaminas().isEmpty();
 
@@ -210,6 +214,23 @@ public class LoteService {
 
         return loteMapper.entidadeParaRetorno(lote);
 
+    }
+
+    @Transactional
+    public RetornoLoteDto descartarLote(Long protocolo){
+        Lote lote = loteRepository.findByProtocolo(protocolo);
+        if (lote == null){
+            throw new LoteInvalidoException("Protocolo inválido ou inexistente");
+        }
+
+        if (lote.getStatusLote() == StatusLote.ENVIADO) {
+            throw new LoteInvalidoException("O lote inserido já foi enviado para processamento, e por tanto, não pode ser descartado.");
+        }
+
+        lote.setStatusLote(StatusLote.DESCARTADO);
+        loteRepository.save(lote);
+
+        return loteMapper.entidadeParaRetorno(lote);
     }
 
 
