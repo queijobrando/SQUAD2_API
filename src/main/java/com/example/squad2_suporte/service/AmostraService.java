@@ -1,7 +1,9 @@
 package com.example.squad2_suporte.service;
 
+import com.example.squad2_suporte.Amostras.Amostra;
 import com.example.squad2_suporte.Amostras.mapper.*;
 import com.example.squad2_suporte.Classes.*;
+import com.example.squad2_suporte.Lamina.Lamina;
 import com.example.squad2_suporte.config.exceptions.AmostraInvalidaException;
 import com.example.squad2_suporte.config.exceptions.RecursoNaoEncontradoException;
 import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
@@ -13,9 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AmostraService {
@@ -104,6 +109,15 @@ public class AmostraService {
         amostraRepository.delete(amostra);
     }
 
+    public Amostra retornarAmostra(Long protocolo){
+        var amostra = amostraRepository.findByProtocolo(protocolo);
+        if (amostra == null){
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
+        }
+
+        return amostra;
+    }
+
     public Object buscarAmostra(Long protocolo){
         var amostra = amostraRepository.findByProtocolo(protocolo);
         if (amostra == null){
@@ -138,6 +152,22 @@ public class AmostraService {
 
     public List<ProtocoloListaAmostraDto> listarTodasAmostras(){
         return amostraRepository.findAll().stream().map(tipoAmostraMapper::listagemAmostras).toList();
+    }
+
+    @Transactional
+    public void adicionarLaudo(MultipartFile arquivo, Long protocolo) throws IOException {
+
+        if (arquivo.isEmpty() || !Objects.requireNonNull(arquivo.getContentType()).equalsIgnoreCase("application/pdf")) {
+            throw new IllegalArgumentException("Tipo de arquivo não suportado.");
+        }
+
+        Amostra amostra = amostraRepository.findByProtocolo(protocolo);
+        if (amostra == null){
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
+        }
+
+        amostra.setLaudo(arquivo.getBytes());
+        amostraRepository.save(amostra);
     }
 
 

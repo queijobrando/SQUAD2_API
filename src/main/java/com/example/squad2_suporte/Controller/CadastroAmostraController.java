@@ -15,10 +15,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -372,6 +377,31 @@ public class CadastroAmostraController {
         }
 
         return ResponseEntity.ok(lista); // 200 OK com a lista
+    }
+
+    @Operation(summary = "Envio de laudo (PDF)", description = "Faz o envio do laudo em PDF associado a uma amostra via protocolo", tags = "Gerenciar Amostras")
+    @PutMapping(path = "/{protocolo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> adicionarLaudo(@PathVariable Long protocolo, @RequestParam("file") MultipartFile arquivo) throws IOException {
+        amostraService.adicionarLaudo(arquivo, protocolo);
+        return ResponseEntity.ok("Laudo adicionado.");
+    }
+
+    @Operation(summary = "Download de laudo (PDF)", description = "Faz o download do laudo em PDF associado a uma amostra via protocolo", tags = "Gerenciar Amostras")
+    @GetMapping("/{protocolo}/laudo")
+    public ResponseEntity<byte[]> baixarLaudo(@PathVariable Long protocolo){
+        var amostra = amostraService.retornarAmostra(protocolo);
+
+        byte[] laudo = amostra.getLaudo();
+        if (laudo == null || laudo.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "laudo-" + protocolo + ".pdf");
+
+        return new ResponseEntity<>(laudo, headers, HttpStatus.OK);
+
     }
 
 }
