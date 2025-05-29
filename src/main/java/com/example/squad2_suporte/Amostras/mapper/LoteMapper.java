@@ -16,26 +16,26 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface LoteMapper {
 
-    @Mapping(target = "protocoloAmostras", source = "amostras", qualifiedByName = "mapearProtocolos")
-    @Mapping(target = "protocoloLaminas", source = "laminas", qualifiedByName = "mapearProtocolosLaminas")
+    @Mapping(target = "protocoloAmostras", expression = "java(mapearSomenteAmostras(lote))")
+    @Mapping(target = "protocoloLaminas", expression = "java(mapearSomenteLaminas(lote))")
     RetornoLoteDto entidadeParaRetorno(Lote lote);
 
-    @Named("mapearProtocolos")
-    default List<ProtocoloAmostraDto> mapearProtocolos(List<Amostra> amostras) {
-        if (amostras == null) {
-            return List.of(); // ou Collections.emptyList();
-        } else {
-            return amostras.stream()
+    default List<ProtocoloAmostraDto> mapearSomenteAmostras(Lote lote) {
+        if (lote.getAmostras() != null && !lote.getAmostras().isEmpty()) {
+            return lote.getAmostras().stream()
                     .map(a -> new ProtocoloAmostraDto(a.getProtocolo(), a.getTipoAmostra(), a.getStatus()))
                     .toList();
         }
+        return List.of();
     }
 
-    @Named("mapearProtocolosLaminas")
-    default List<LoteLaminaProtocoloDto> mapearProtocolosLaminas(List<Lamina> laminas) {
-        if (laminas == null) return List.of();
-        return laminas.stream()
-                .map(l -> new LoteLaminaProtocoloDto(l.getProtocolo(), l.getStatus()))
-                .toList();
+    default List<LoteLaminaProtocoloDto> mapearSomenteLaminas(Lote lote) {
+        if (lote.getLaminas() != null && !lote.getLaminas().isEmpty()) {
+            return lote.getLaminas().stream()
+                    .map(l -> new LoteLaminaProtocoloDto(l.getProtocolo(), l.getStatus()))
+                    .toList();
+        }
+        return List.of();
     }
 }
+

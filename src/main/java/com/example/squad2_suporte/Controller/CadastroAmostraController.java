@@ -3,6 +3,7 @@ package com.example.squad2_suporte.Controller;
 import com.example.squad2_suporte.config.RestErrorMessage;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
+import com.example.squad2_suporte.dto.amostra.ProtocoloListaAmostraDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoIdAmostras;
 import com.example.squad2_suporte.service.AmostraService;
@@ -363,7 +364,7 @@ public class CadastroAmostraController {
             @ApiResponse(responseCode = "204", description = "Nenhuma amostra encontrada", content = @Content),
     })
     @GetMapping
-    public ResponseEntity<List<ProtocoloAmostraDto>> listarAmostrasCadastradas(){
+    public ResponseEntity<List<ProtocoloListaAmostraDto>> listarAmostrasCadastradas(){
         var lista = amostraService.listarTodasAmostras();
 
         if (lista.isEmpty()) {

@@ -45,37 +45,35 @@ public class LoteService {
         List<Amostra> amostras = amostraRepository.findAllByProtocoloIn(loteDto.protocolos());
         List<Lamina> laminas = laminaRepository.findAllByProtocoloIn(loteDto.protocolos());
 
-        List<Object> coletas = new ArrayList<>();
-        coletas.addAll(amostras);
-        coletas.addAll(laminas);
+        int totalEncontrado = amostras.size() + laminas.size();
 
-        if (coletas.size() != loteDto.protocolos().size()){
+        if (totalEncontrado != loteDto.protocolos().size()){
             throw new RequisicaoInvalidaException("Alguma amostra não foi encontrada");
         }
 
-        // Verifica se a alguma amostra ja tem lote
-        for (Amostra amostra : amostras){
-            if (amostra.getLote() != null){
-                throw new AmostraInvalidaException("A amostra com protocolo " + amostra.getProtocolo() + " já possui um lote cadastrado!");
-            }
-        }
-        // Verifica se a alguma lamina ja tem lote
-        for (Lamina lamina : laminas){
-            if (lamina.getLote() != null){
-                throw new AmostraInvalidaException("A amostra com protocolo " + lamina.getProtocolo() + " já possui um lote cadastrado!");
-            }
+        // Regra: não pode haver mistura de tipos
+        if (!amostras.isEmpty() && !laminas.isEmpty()) {
+            throw new RequisicaoInvalidaException("Não é permitido criar um lote com amostras e lâminas ao mesmo tempo.");
         }
 
-
-        //Seta o lote ID em cada amostra
         Lote lote = new Lote();
-        for (Amostra amostra : amostras) {
-            amostra.setLote(lote);
-            lote.getAmostras().add(amostra);
-        }
-        for (Lamina lamina : laminas) {
-            lamina.setLote(lote);
-            lote.getLaminas().add(lamina);
+
+        if (!amostras.isEmpty()) {
+            for (Amostra amostra : amostras) {
+                if (amostra.getLote() != null) {
+                    throw new AmostraInvalidaException("A amostra com protocolo " + amostra.getProtocolo() + " já possui um lote cadastrado!");
+                }
+                amostra.setLote(lote);
+                lote.getAmostras().add(amostra);
+            }
+        } else {
+            for (Lamina lamina : laminas) {
+                if (lamina.getLote() != null) {
+                    throw new AmostraInvalidaException("A lâmina com protocolo " + lamina.getProtocolo() + " já possui um lote cadastrado!");
+                }
+                lamina.setLote(lote);
+                lote.getLaminas().add(lamina);
+            }
         }
 
         return loteRepository.save(lote);
@@ -88,15 +86,22 @@ public class LoteService {
     }
 
     @Transactional
-    public RetornoLoteDto editarLote(EditarLoteDto dto, Long loteProtocolo){
-        if (dto.protocoloAmostras() == null || dto.protocoloAmostras().isEmpty()){
-            throw new LoteInvalidoException("É necessário ao menos uma amostra para editar um lote!");
+    public RetornoLoteDto editarLote(EditarLoteDto dto, Long loteProtocolo) {
+        if (dto.protocolos() == null || dto.protocolos().isEmpty()) {
+            throw new LoteInvalidoException("É necessário ao menos uma amostra ou lâmina para editar um lote!");
         }
 
-        List<Amostra> listaAmostras = amostraRepository.findAllByProtocoloIn(dto.protocoloAmostras());
+        List<Amostra> listaAmostras = amostraRepository.findAllByProtocoloIn(dto.protocolos());
+        List<Lamina> listaLaminas = laminaRepository.findAllByProtocoloIn(dto.protocolos());
 
-        if (listaAmostras.size() != dto.protocoloAmostras().size()){
-            throw new RequisicaoInvalidaException("Alguma amostra não foi encontrada");
+        int totalEncontrado = listaAmostras.size() + listaLaminas.size();
+
+        if (totalEncontrado != dto.protocolos().size()) {
+            throw new RequisicaoInvalidaException("Alguma amostra ou lâmina não foi encontrada");
+        }
+
+        if (!listaAmostras.isEmpty() && !listaLaminas.isEmpty()) {
+            throw new RequisicaoInvalidaException("Não é permitido editar um lote com amostras e lâminas ao mesmo tempo.");
         }
 
         Lote lote = loteRepository.findByProtocolo(loteProtocolo);
@@ -104,33 +109,61 @@ public class LoteService {
             throw new RequisicaoInvalidaException("Lote com protocolo " + loteProtocolo + " não encontrado");
         }
 
-        switch (dto.opcao()){
+        boolean loteContemAmostras = !lote.getAmostras().isEmpty();
+        boolean loteContemLaminas = !lote.getLaminas().isEmpty();
+
+        // Verificação de tipo único no lote
+        if ((loteContemAmostras && !listaAmostras.isEmpty()) || (loteContemLaminas && !listaLaminas.isEmpty())) {
+            // OK - tipos batem
+        } else if ((loteContemAmostras && !listaLaminas.isEmpty()) || (loteContemLaminas && !listaAmostras.isEmpty())) {
+            throw new RequisicaoInvalidaException("Não é permitido adicionar ou remover itens de tipo diferente dos já presentes no lote.");
+        } else if (!loteContemAmostras && !loteContemLaminas) {
+            // Lote está vazio, qualquer tipo é aceito
+        }
+
+        switch (dto.opcao()) {
             case ADICIONAR -> {
-                // Verifica se a alguma amostra ja tem lote
-                for (Amostra amostra : listaAmostras){
-                    if (amostra.getLote() != null){
+                for (Amostra amostra : listaAmostras) {
+                    if (amostra.getLote() != null) {
                         throw new AmostraInvalidaException("A amostra com protocolo " + amostra.getProtocolo() + " já possui um lote cadastrado!");
                     }
                     amostra.setLote(lote);
                     lote.getAmostras().add(amostra);
                 }
+
+                for (Lamina lamina : listaLaminas) {
+                    if (lamina.getLote() != null) {
+                        throw new AmostraInvalidaException("A lâmina com protocolo " + lamina.getProtocolo() + " já possui um lote cadastrado!");
+                    }
+                    lamina.setLote(lote);
+                    lote.getLaminas().add(lamina);
+                }
             }
+
             case REMOVER -> {
-                // Verifica se a alguma amostra ja tem lote
-                for (Amostra amostra : listaAmostras){
-                    if (!lote.equals((amostra.getLote()))){
-                        throw new AmostraInvalidaException("A amostra com protocolo " + amostra.getProtocolo() + "não pertence a este lote!");
+                for (Amostra amostra : listaAmostras) {
+                    if (!lote.equals(amostra.getLote())) {
+                        throw new AmostraInvalidaException("A amostra com protocolo " + amostra.getProtocolo() + " não pertence a este lote!");
                     }
                     amostra.setLote(null);
                     lote.getAmostras().remove(amostra);
                 }
 
+                for (Lamina lamina : listaLaminas) {
+                    if (!lote.equals(lamina.getLote())) {
+                        throw new AmostraInvalidaException("A lâmina com protocolo " + lamina.getProtocolo() + " não pertence a este lote!");
+                    }
+                    lamina.setLote(null);
+                    lote.getLaminas().remove(lamina);
+                }
             }
+
             default -> throw new RequisicaoInvalidaException("Opção Inválida: " + dto.opcao());
         }
 
         return loteMapper.entidadeParaRetorno(lote);
     }
+
     public List<RetornoLoteDto> buscarLotesPorMunicipio(String municipio) {
         List<Lote> lotes = loteRepository.findByMunicipio(municipio);
         return lotes.stream()
