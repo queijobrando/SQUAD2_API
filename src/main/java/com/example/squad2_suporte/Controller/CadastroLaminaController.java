@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("cadastro/lamina")
+@RequestMapping("gerenciar/lamina")
 public class CadastroLaminaController {
 
     @Autowired
@@ -37,16 +37,16 @@ public class CadastroLaminaController {
     public ResponseEntity<RetornoLaminaDto> cadastrarLamina(@RequestBody LaminaDto dto, UriComponentsBuilder uriComponentsBuilder){
         var novaLamina = laminaService.cadastrarLamina(dto);
 
-        var uri = uriComponentsBuilder.path("cadastro/lamina/{id}").buildAndExpand(novaLamina.getId()).toUri();
+        var uri = uriComponentsBuilder.path("gerenciar/lamina/{id}").buildAndExpand(novaLamina.getId()).toUri();
 
         return ResponseEntity.created(uri).body(laminaMapper.entidadeParaRetorno(novaLamina)); // 201 CREATED
     }
 
-    @Operation(summary = "Deletar Lamina", description = "Metodo para deletar uma lamina existente pelo numero do protocolo", tags = "Gerenciar Lamina")
+    @Operation(summary = "Descartar Lamina", description = "Metodo para descartar uma lamina existente pelo numero do protocolo", tags = "Gerenciar Lamina")
     @DeleteMapping("/{protocolo}")
     public ResponseEntity<String> removerLamina(@PathVariable Long protocolo) {
         laminaService.deletarLamina(protocolo);
-        return ResponseEntity.ok("Lamina removida!");
+        return ResponseEntity.ok("Lamina descartada!");
     }
 
     @Operation(summary = "Buscar Lamina", description = "Metodo para buscar e exibir informações de uma lamina", tags = "Gerenciar Lamina")
@@ -77,10 +77,18 @@ public class CadastroLaminaController {
     }
 
     @Operation(summary = "Envio de laudo (PDF)", description = "Faz o envio do laudo em PDF associado a uma lamina via protocolo", tags = "Gerenciar Lamina")
-    @PutMapping(path = "/{protocolo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(path = "/{protocolo}/laudo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> adicionarLaudo(@PathVariable Long protocolo, @RequestParam("file") MultipartFile arquivo) throws IOException {
         laminaService.adicionarLaudo(arquivo, protocolo);
         return ResponseEntity.ok("Laudo adicionado.");
+    }
+
+    @Operation(summary = "Analisar lamina", description = "Metodo para definir o status da lamina como ANALISADA", tags = "Gerenciar Lamina")
+    @PutMapping("/{protocolo}/analisar")
+    public ResponseEntity<RetornoLaminaDto> analisarAmostra(@PathVariable Long protocolo){
+        var lamina = laminaService.analisarLamina(protocolo);
+
+        return ResponseEntity.ok(laminaMapper.entidadeParaRetorno(lamina));
     }
 
     @Operation(summary = "Download de laudo (PDF)", description = "Faz o download do laudo em PDF associado a uma lamina via protocolo", tags = "Gerenciar Lamina")

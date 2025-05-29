@@ -9,6 +9,8 @@ import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import com.example.squad2_suporte.dto.lote.EditarLoteDto;
 import com.example.squad2_suporte.dto.lote.LoteDto;
 import com.example.squad2_suporte.dto.lote.RetornoLoteDto;
+import com.example.squad2_suporte.enuns.StatusAmostra;
+import com.example.squad2_suporte.enuns.StatusLote;
 import com.example.squad2_suporte.lote.Lote;
 import com.example.squad2_suporte.repositorios.AmostraRepository;
 import com.example.squad2_suporte.repositorios.LaminaRepository;
@@ -169,6 +171,45 @@ public class LoteService {
         return lotes.stream()
                 .map(loteMapper::entidadeParaRetorno)
                 .toList();
+    }
+
+    @Transactional
+    public RetornoLoteDto enviarLote(Long protocolo){
+        Lote lote = loteRepository.findByProtocolo(protocolo);
+        if (lote == null){
+            throw new LoteInvalidoException("Protocolo inválido ou inexistente");
+        }
+
+        if (lote.getStatusLote() == StatusLote.DESCARTADO){
+            throw new LoteInvalidoException("O lote inserido já foi DESCARTADO e por isso não pode ser enviado.");
+        } else if (lote.getStatusLote() == StatusLote.ENVIADO) {
+            throw new LoteInvalidoException("O lote inserido já foi enviado para processamento.");
+        }
+
+        List<Amostra> amostras = lote.getAmostras();
+        List<Lamina> laminas = lote.getLaminas();
+
+        for (Amostra amostra : amostras){
+            if (amostra.getStatus() == StatusAmostra.DESCARTADA){
+                throw new AmostraInvalidaException("A amostra de protocolo " + amostra.getProtocolo() + " foi descartada e não pode ser enviada.");
+            } else if (amostra.getStatus() == StatusAmostra.PENDENTE) {
+                throw new AmostraInvalidaException("A amostra de protocolo " + amostra.getProtocolo() + " está PENDENTE e precisa ser ANALISADA antes do envio");
+            }
+        }
+
+        for (Lamina lamina : laminas){
+            if (lamina.getStatus() == StatusAmostra.DESCARTADA){
+                throw new AmostraInvalidaException("A lamina de protocolo " + lamina.getProtocolo() + " foi descartada e não pode ser enviada.");
+            } else if (lamina.getStatus() == StatusAmostra.PENDENTE) {
+                throw new AmostraInvalidaException("A lamina de protocolo " + lamina.getProtocolo() + " está PENDENTE e precisa ser ANALISADA antes do envio");
+            }
+        }
+
+        lote.setStatusLote(StatusLote.ENVIADO);
+        loteRepository.save(lote);
+
+        return loteMapper.entidadeParaRetorno(lote);
+
     }
 
 

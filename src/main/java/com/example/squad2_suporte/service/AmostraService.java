@@ -10,6 +10,7 @@ import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
 import com.example.squad2_suporte.dto.amostra.ProtocoloListaAmostraDto;
+import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.repositorios.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -106,7 +107,8 @@ public class AmostraService {
             throw new RequisicaoInvalidaException("A amostra com protocolo " + protocolo + " está associada a um lote e não pode ser deletada.");
         }
 
-        amostraRepository.delete(amostra);
+        amostra.setStatus(StatusAmostra.DESCARTADA);
+        amostraRepository.save(amostra);
     }
 
     public Amostra retornarAmostra(Long protocolo){
@@ -168,6 +170,44 @@ public class AmostraService {
 
         amostra.setLaudo(arquivo.getBytes());
         amostraRepository.save(amostra);
+    }
+
+    @Transactional
+    public Object analisarAmostra(Long protocolo){
+        var amostra = amostraRepository.findByProtocolo(protocolo);
+        if (amostra == null){
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
+        }
+
+        if (amostra.getStatus() == StatusAmostra.DESCARTADA){
+            throw new AmostraInvalidaException("A amostra possui o status DESCARTADA e por tanto não pode ser mais ANALISADA");
+        } else {
+            amostra.setStatus(StatusAmostra.ANALISADA);
+            amostraRepository.save(amostra);
+            switch (amostra.getTipoAmostra()){
+                case ESCORPIAO -> {
+                    Escorpioes escorpioes = amostraEscorpiaoRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.escorpiaoEntidadeParaRetorno(escorpioes);
+                }
+                case FLEBOTOMINEOS -> {
+                    Flebotomineos flebo = amostraFlebotomineosRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.flebotomineosEntidadeParaRetorno(flebo);
+                }
+                case TRIATOMINEOS -> {
+                    Triatomineos triato = amostraTriatomineosRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.triatomieosEntidadeParaRetorno(triato);
+                }
+                case LARVAS -> {
+                    Larvas larvas = amostraLarvaRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.larvasEntidadeParaRetorno(larvas);
+                }
+                case MOLUSCO -> {
+                    Molusco molusco = amostraMoluscoRepository.findByProtocolo(protocolo);
+                    return tipoAmostraMapper.moluscoEntidadeParaRetorno(molusco);
+                }
+                default -> throw new RecursoNaoEncontradoException("Tipo de amostra não encontrada");
+            }
+        }
     }
 
 

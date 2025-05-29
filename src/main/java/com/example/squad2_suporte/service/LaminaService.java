@@ -2,11 +2,14 @@ package com.example.squad2_suporte.service;
 
 import com.example.squad2_suporte.Amostras.Amostra;
 import com.example.squad2_suporte.Amostras.mapper.LaminaMapper;
+import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.Lamina.Lamina;
+import com.example.squad2_suporte.config.exceptions.AmostraInvalidaException;
 import com.example.squad2_suporte.config.exceptions.RecursoNaoEncontradoException;
 import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import com.example.squad2_suporte.dto.lamina.LaminaDto;
 import com.example.squad2_suporte.dto.lamina.RetornoLaminaDto;
+import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.repositorios.LaminaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +46,8 @@ public class LaminaService {
             throw new RequisicaoInvalidaException("A lamina com protocolo " + protocolo + " está associada a um lote e não pode ser deletada.");
         }
 
-            laminaRepository.delete(lamina);
+        lamina.setStatus(StatusAmostra.DESCARTADA);
+        laminaRepository.save(lamina);
 
     }
 
@@ -74,5 +78,21 @@ public class LaminaService {
 
         lamina.setLaudo(arquivo.getBytes());
         laminaRepository.save(lamina);
+    }
+
+    @Transactional
+    public Lamina analisarLamina(Long protocolo){
+        var lamina = laminaRepository.findByProtocolo(protocolo);
+        if (lamina == null){
+            throw new RecursoNaoEncontradoException("Protocolo inválido ou inexistente");
+        }
+
+        if (lamina.getStatus() == StatusAmostra.DESCARTADA){
+            throw new AmostraInvalidaException("A lamina possui o status DESCARTADA e por tanto não pode ser mais ANALISADA");
+        }
+
+        lamina.setStatus(StatusAmostra.ANALISADA);
+        laminaRepository.save(lamina);
+        return lamina;
     }
 }

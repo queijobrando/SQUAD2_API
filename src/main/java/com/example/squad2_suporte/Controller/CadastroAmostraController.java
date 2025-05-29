@@ -255,7 +255,7 @@ public class CadastroAmostraController {
 
         Long id = ((RetornoIdAmostras) amostra).id();
 
-        var uri = uriComponentsBuilder.path("cadastro/amostra/{id}").buildAndExpand(id).toUri();
+        var uri = uriComponentsBuilder.path("gerenciar/amostra/{id}").buildAndExpand(id).toUri();
 
         return ResponseEntity.created(uri).body(amostra); // 201 created
     }
@@ -264,10 +264,10 @@ public class CadastroAmostraController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Amostra deletada com sucesso",
+                    description = "Amostra descartada com sucesso",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(example = "Amostra removida!")
+                            schema = @Schema(example = "Amostra descartada!")
                     )
             ),
             @ApiResponse(
@@ -307,11 +307,11 @@ public class CadastroAmostraController {
                     )
             )
     })
-    @Operation(summary = "Deletar Amostra", description = "Metodo para deletar uma amostra existente pelo numero do protocolo", tags = "Gerenciar Amostras")
+    @Operation(summary = "Descartar Amostra", description = "Metodo para descartar uma amostra existente pelo numero do protocolo", tags = "Gerenciar Amostras")
     @DeleteMapping("/{protocolo}")
     public ResponseEntity<String> removerAmostra(@PathVariable Long protocolo) {
         amostraService.deletarAmostra(protocolo);
-        return ResponseEntity.ok("Amostra removida!");
+        return ResponseEntity.ok("Amostra descartada!");
     }
 
 
@@ -380,10 +380,18 @@ public class CadastroAmostraController {
     }
 
     @Operation(summary = "Envio de laudo (PDF)", description = "Faz o envio do laudo em PDF associado a uma amostra via protocolo", tags = "Gerenciar Amostras")
-    @PutMapping(path = "/{protocolo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(path = "/{protocolo}/laudo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> adicionarLaudo(@PathVariable Long protocolo, @RequestParam("file") MultipartFile arquivo) throws IOException {
         amostraService.adicionarLaudo(arquivo, protocolo);
         return ResponseEntity.ok("Laudo adicionado.");
+    }
+
+    @Operation(summary = "Analisar amostra", description = "Metodo para definir o status da amostra como ANALISADA", tags = "Gerenciar Amostras")
+    @PutMapping("/{protocolo}/analisar")
+    public ResponseEntity<?> analisarAmostra(@PathVariable Long protocolo){
+        var amostra = amostraService.analisarAmostra(protocolo);
+
+        return ResponseEntity.ok(amostra);
     }
 
     @Operation(summary = "Download de laudo (PDF)", description = "Faz o download do laudo em PDF associado a uma amostra via protocolo", tags = "Gerenciar Amostras")
