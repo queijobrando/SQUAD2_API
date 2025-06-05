@@ -25,25 +25,21 @@ public class GerenciarLoteController {
     @Autowired
     private LoteMapper loteMapper;
 
-    @Operation(summary = "Criar Lote", description = "Metodo para criar um novo lote", tags = "Gerenciar Lote")
+    @Operation(summary = "Criar Lote", description = "Método para criar um novo lote", tags = "Gerenciar Lote")
     @PostMapping("criar")
-    public ResponseEntity<RetornoLoteDto> criarLote(@RequestBody LoteDto loteDto, UriComponentsBuilder uriComponentsBuilder){
+    public ResponseEntity<RetornoLoteDto> criarLote(@RequestBody LoteDto loteDto, UriComponentsBuilder uriComponentsBuilder) {
         var lote = loteService.cadastrarLote(loteDto);
-
         var uri = uriComponentsBuilder.path("gerenciar/lote/criar/{id}").buildAndExpand(lote.getId()).toUri();
-
         return ResponseEntity.created(uri).body(loteMapper.entidadeParaRetorno(lote));
     }
 
-    @Operation(summary = "Listar Lotes", description = "Metodo para listar lotes cadastrados", tags = "Gerenciar Lote")
+    @Operation(summary = "Listar Lotes", description = "Método para listar lotes cadastrados", tags = "Gerenciar Lote")
     @GetMapping("lotesCadastrados")
-    public ResponseEntity<List<RetornoLoteDto>> listarLotes(){
+    public ResponseEntity<List<RetornoLoteDto>> listarLotes() {
         var listaLotes = loteService.listarLotes();
-
         if (listaLotes.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content
         }
-
         return ResponseEntity.ok(listaLotes);
     }
 
@@ -56,40 +52,36 @@ public class GerenciarLoteController {
                             mediaType = "application/json",
                             examples = {
                                     @ExampleObject(
-                                            name = "Adicionar Amostra OU Lamina",
+                                            name = "Adicionar Amostra OU Lâmina",
                                             value = """
-                    {
-                      "opcao": "ADICIONAR",
-                      "protocolos": [
-                        123, 124
-                      ]
-                    }
-                    """
+                                            {
+                                              "opcao": "ADICIONAR",
+                                              "protocolos": ["20250602-00001", "20250602-00002"]
+                                            }
+                                            """
                                     ),
                                     @ExampleObject(
-                                            name = "Remover Amostra OU Lamina",
+                                            name = "Remover Amostra OU Lâmina",
                                             value = """
-                    {
-                      "opcao": "REMOVER",
-                      "protocolos": [
-                        123
-                      ]
-                    }
-                    """
+                                            {
+                                              "opcao": "REMOVER",
+                                              "protocolos": ["20250602-00001"]
+                                            }
+                                            """
                                     )
                             }
                     )
             )
     )
     @PutMapping("/{protocolo}")
-    public ResponseEntity<RetornoLoteDto> editarLote(@PathVariable Long protocolo, @RequestBody EditarLoteDto dto) {
-        RetornoLoteDto lote = loteService.editarLote(dto, protocolo);
+    public ResponseEntity<RetornoLoteDto> editarLote(@PathVariable String protocolo, @RequestBody EditarLoteDto dto) {
+        RetornoLoteDto lote = loteService.editarLote(dto, protocolo); // Removida a conversão para Long
         return ResponseEntity.ok(lote);
     }
 
-    @Operation(summary = "Enviar Lote", description = "Metodo para definir o status do lote como ENVIADO", tags = "Gerenciar Lote")
+    @Operation(summary = "Enviar Lote", description = "Método para definir o status do lote como ENVIADO", tags = "Gerenciar Lote")
     @PutMapping("/{protocolo}/enviar")
-    public ResponseEntity<RetornoLoteDto> enviarLote(@PathVariable Long protocolo){
+    public ResponseEntity<RetornoLoteDto> enviarLote(@PathVariable String protocolo) {
         RetornoLoteDto lote = loteService.enviarLote(protocolo);
         return ResponseEntity.ok(lote);
     }
@@ -98,28 +90,23 @@ public class GerenciarLoteController {
     @GetMapping("/buscar-por-municipio")
     public ResponseEntity<List<RetornoLoteDto>> buscarPorMunicipio(@RequestParam String municipio) {
         List<RetornoLoteDto> lotes = loteService.buscarLotesPorMunicipio(municipio);
-
         if (lotes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
         return ResponseEntity.ok(lotes);
     }
 
-    @Operation(summary = "Buscar Lote", description = "Metodo para buscar lote cadastrado", tags = "Gerenciar Lote")
+    @Operation(summary = "Buscar Lote", description = "Método para buscar lote cadastrado", tags = "Gerenciar Lote")
     @GetMapping("/{protocolo}")
-    public ResponseEntity<RetornoLoteDto> buscarLote(@PathVariable Long protocolo){
+    public ResponseEntity<RetornoLoteDto> buscarLote(@PathVariable String protocolo) {
         var lote = loteService.buscarLote(protocolo);
         return ResponseEntity.ok(lote);
     }
 
-    @Operation(summary = "Descartar Lote", description = "Metodo para descartar um lote", tags = "Gerenciar Lote")
+    @Operation(summary = "Descartar Lote", description = "Método para descartar um lote", tags = "Gerenciar Lote")
     @DeleteMapping("/{protocolo}")
-    public ResponseEntity<RetornoLoteDto> descartarLote(@PathVariable Long protocolo){
+    public ResponseEntity<RetornoLoteDto> descartarLote(@PathVariable String protocolo) {
         RetornoLoteDto lote = loteService.descartarLote(protocolo);
-
         return ResponseEntity.ok(lote);
     }
-
-
 }

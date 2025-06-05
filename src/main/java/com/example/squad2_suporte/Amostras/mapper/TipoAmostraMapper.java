@@ -40,16 +40,15 @@ public interface TipoAmostraMapper {
     RetornoFlebotomineosDto flebotomineosEntidadeParaRetorno(Flebotomineos flebotomineos);
 
 
-    //Triatomineos
-    @Mapping(target = "tipoAmostra", constant = "TRIATOMINEOS")
-    @Mapping(target = "dataHora", source = "dataHora", qualifiedByName = "removerSegundos") // herança
-    @Mapping(target = "endereco", source = "enderecoDto") // usando EnderecoMapper
-    Triatomineos amostraDtoParaTriatomineos(AmostraDto dto);
+    // Triatomineos
+@Mapping(target = "tipoAmostra", constant = "TRIATOMINEOS")
+@Mapping(target = "dataHora", source = "dataHora", qualifiedByName = "removerSegundos") // herança
+@Mapping(target = "endereco", source = "enderecoDto") // usando EnderecoMapper
+Triatomineos amostraDtoParaTriatomineos(AmostraDto dto);
 
-    @Mapping(target = "enderecoDto", source = "endereco")
-    @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
-    RetornoTriatomineosDto triatomieosEntidadeParaRetorno(Triatomineos triatomineos);
-
+@Mapping(target = "enderecoDto", source = "endereco")
+@Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
+RetornoTriatomineosDto triatomineosEntidadeParaRetorno(Triatomineos triatomineos); 
 
     //Molusco
     @Mapping(target = "tipoAmostra", constant = "MOLUSCO")

@@ -8,15 +8,20 @@ import com.example.squad2_suporte.enuns.molusco.TipoMolusco;
 import com.example.squad2_suporte.enuns.triatomineos.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDateTime;
 
 public record AmostraDto(
         @NotNull(message = "O campo tipoAmostra é obrigatório")
         TipoAmostra tipoAmostra,
+        @NotNull(message = "O campo dataHora é obrigatório")
         @Schema(type = "string", pattern = "yyyy-MM-dd'T'HH:mm", example = "2025-05-19T14:30")
         LocalDateTime dataHora,
+        @NotNull(message = "O campo enderecoDto é obrigatório")
         EnderecoDto enderecoDto,
+        @NotNull(message = "O campo quantidade é obrigatório")
+        @Positive(message = "A quantidade deve ser maior que zero")
         Integer quantidade,
         Boolean sofreuAcidente,
         ClassificacaoAreaLT classificacaoAreaLT,
@@ -59,5 +64,6 @@ public record AmostraDto(
         Resultado resultado,
         Integer numLarvas,
         TipoLarva tipoLarva,
-        String tipoImovel) {
+        String tipoImovel
+) {
 }

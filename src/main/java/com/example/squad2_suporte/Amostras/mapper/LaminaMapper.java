@@ -12,9 +12,12 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface LaminaMapper {
 
+    @Mapping(target = "enderecoCaptura", source = "enderecoCaptura")
+    @Mapping(target = "baseLegal", ignore = true) // Será tratado no serviço
     Lamina dtoParaEntidade(LaminaDto laminaDto);
 
     @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
+    @Mapping(target = "enderecoCaptura", source = "enderecoCaptura")
     RetornoLaminaDto entidadeParaRetorno(Lamina lamina);
 
     @Named("mapearLoteParaProtocolo")

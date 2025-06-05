@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class Lote {
     private Long id;
 
     @Column(unique = true)
-    private Long protocolo;
+    private String protocolo;
 
     @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL)
     private List<Amostra> amostras = new ArrayList<>();
@@ -40,11 +39,4 @@ public class Lote {
     @Column(nullable = false)
     private LocalDateTime dataCriacao;
 
-    @PrePersist
-    public void gerarProtocolo() {
-        //gerar número com base no timestamp
-        this.protocolo = System.currentTimeMillis();
-        this.statusLote = StatusLote.PENDENTE;
-        this.dataCriacao = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-    }
 }

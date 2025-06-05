@@ -1,0 +1,1 @@
+ALTER TABLE envio_amostras MODIFY endereco_rua VARBINARY(255);

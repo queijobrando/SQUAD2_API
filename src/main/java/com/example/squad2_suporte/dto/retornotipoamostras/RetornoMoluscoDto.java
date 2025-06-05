@@ -10,7 +10,7 @@ import com.example.squad2_suporte.enuns.molusco.TipoMolusco;
 import java.time.LocalDateTime;
 
 public record RetornoMoluscoDto(
-        Long protocolo,
+        String protocolo,
         TipoAmostra tipoAmostra,
         Long id,
         LoteProtocoloDto lote,

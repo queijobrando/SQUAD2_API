@@ -9,7 +9,7 @@ import com.example.squad2_suporte.lote.Lote;
 
 import java.time.LocalDateTime;
 
-public record RetornoTriatomineosDto(Long protocolo,
+public record RetornoTriatomineosDto(String protocolo,
                                      Long id,
                                      LoteProtocoloDto lote,
                                      StatusAmostra status,

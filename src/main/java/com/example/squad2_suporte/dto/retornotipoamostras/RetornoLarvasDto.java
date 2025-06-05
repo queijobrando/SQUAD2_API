@@ -10,7 +10,7 @@ import com.example.squad2_suporte.lote.Lote;
 import java.time.LocalDateTime;
 
 public record RetornoLarvasDto(
-        Long protocolo,
+        String protocolo,
         TipoAmostra tipoAmostra,
         Long id,
         LoteProtocoloDto lote,

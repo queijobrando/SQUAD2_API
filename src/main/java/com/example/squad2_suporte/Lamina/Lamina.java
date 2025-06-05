@@ -1,26 +1,18 @@
 package com.example.squad2_suporte.Lamina;
 
-import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.lote.Lote;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
 
 @Entity
 @Table(name = "lamina")
-@Inheritance(strategy = InheritanceType.JOINED)
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
+@Builder
 public class Lamina {
 
     @Id
@@ -31,32 +23,30 @@ public class Lamina {
     private LocalDateTime data;
 
     @Column(unique = true)
-    private Long protocolo;
+    private String protocolo;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StatusAmostra status;
 
     @ManyToOne
-    @JoinColumn(name = "lote_id") // Amostra pode ou não ter um lote
+    @JoinColumn(name = "lote_id")
     @JsonIgnore
     private Lote lote;
 
-    @Column(nullable = false)
+    @Column
     private Integer numeroOvos;
 
+    @Column
     private String resultado;
 
     @Lob
     @Column(columnDefinition = "BLOB")
     private byte[] laudo;
 
-    @PrePersist
-    public void geracaoAutomatica() {
-        this.data = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS); // define a data/hora/segundos que for cadastrada
-        this.protocolo = System.currentTimeMillis();
-        this.status = StatusAmostra.PENDENTE;
-    }
+    @Column
+    private String enderecoCaptura; // Novo campo
 
-
+    @Column
+    private String baseLegal; // Campo para LGPD, adicionado anteriormente
 }

@@ -5,7 +5,7 @@ import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.enuns.TipoAmostra;
 
 public record ProtocoloListaAmostraDto(
-        Long protocolo,
+        String protocolo,
         TipoAmostra tipoAmostra,
         StatusAmostra status,
         LoteProtocoloDto lote) {

@@ -8,5 +8,5 @@ import com.example.squad2_suporte.lote.Lote;
 
 import java.time.LocalDateTime;
 
-public record RetornoEscorpiaoDto(Long protocolo, Long id, LoteProtocoloDto lote, TipoAmostra tipoAmostra, StatusAmostra status, LocalDateTime dataHora, EnderecoDto enderecoDto, Integer quantidade , boolean sofreuAcidente) implements RetornoIdAmostras {
+public record RetornoEscorpiaoDto(String protocolo, Long id, LoteProtocoloDto lote, TipoAmostra tipoAmostra, StatusAmostra status, LocalDateTime dataHora, EnderecoDto enderecoDto, Integer quantidade , boolean sofreuAcidente) implements RetornoIdAmostras {
 }
