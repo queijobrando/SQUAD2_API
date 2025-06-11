@@ -15,7 +15,11 @@ import com.example.squad2_suporte.enuns.StatusLote;
 import com.example.squad2_suporte.enuns.TipoAmostra;
 import com.example.squad2_suporte.repositorios.*;
 import com.example.squad2_suporte.config.DataAnonymizer;
+import com.example.squad2_suporte.config.AmostraSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -425,5 +429,12 @@ public class AmostraService {
             default:
                 throw new RecursoNaoEncontradoException("Tipo de amostra não encontrada");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProtocoloListaAmostraDto> filtrarAmostras(TipoAmostra tipoAmostra, StatusAmostra status, String municipio, Pageable pageable) {
+        Specification<Amostra> spec = AmostraSpecification.filtrarAmostras(tipoAmostra, status, municipio);
+        Page<Amostra> amostras = amostraRepository.findAll(spec, pageable);
+        return amostras.map(tipoAmostraMapper::listagemAmostras);
     }
 }

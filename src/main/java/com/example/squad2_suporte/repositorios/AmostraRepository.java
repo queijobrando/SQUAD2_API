@@ -4,6 +4,9 @@ import com.example.squad2_suporte.Amostras.Amostra;
 import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.enuns.TipoAmostra;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -22,4 +25,7 @@ public interface AmostraRepository extends JpaRepository<Amostra, Long> {
     List<Amostra> findByTipoAmostraAndStatus(TipoAmostra tipoAmostra, StatusAmostra status);
 
     List<Amostra> findByDataHoraBeforeAndStatusIn(LocalDateTime cutoffDate, List<StatusAmostra> statuses);
+
+    // Novo método para suportar filtros dinâmicos e paginação
+    Page<Amostra> findAll(Specification<Amostra> spec, Pageable pageable);
 }

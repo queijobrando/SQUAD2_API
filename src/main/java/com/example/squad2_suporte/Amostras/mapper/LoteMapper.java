@@ -4,20 +4,20 @@ import com.example.squad2_suporte.Amostras.Amostra;
 import com.example.squad2_suporte.Lamina.Lamina;
 import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
 import com.example.squad2_suporte.dto.lamina.LoteLaminaProtocoloDto;
-import com.example.squad2_suporte.dto.lamina.RetornoLaminaDto;
 import com.example.squad2_suporte.dto.lote.RetornoLoteDto;
 import com.example.squad2_suporte.lote.Lote;
+import com.example.squad2_suporte.enuns.TipoLote;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface LoteMapper {
 
-    @Mapping(target = "protocoloAmostras", expression = "java(mapearSomenteAmostras(lote))")
-    @Mapping(target = "protocoloLaminas", expression = "java(mapearSomenteLaminas(lote))")
+    @Mapping(target = "tipo", source = "tipo")
+    @Mapping(target = "protocoloAmostras", expression = "java(lote.getTipo() == TipoLote.AMOSTRA ? mapearSomenteAmostras(lote) : null)")
+    @Mapping(target = "protocoloLaminas", expression = "java(lote.getTipo() == TipoLote.LAMINA ? mapearSomenteLaminas(lote) : null)")
     RetornoLoteDto entidadeParaRetorno(Lote lote);
 
     default List<ProtocoloAmostraDto> mapearSomenteAmostras(Lote lote) {
@@ -26,7 +26,7 @@ public interface LoteMapper {
                     .map(a -> new ProtocoloAmostraDto(a.getProtocolo(), a.getTipoAmostra(), a.getStatus()))
                     .toList();
         }
-        return List.of();
+        return null;
     }
 
     default List<LoteLaminaProtocoloDto> mapearSomenteLaminas(Lote lote) {
@@ -35,7 +35,6 @@ public interface LoteMapper {
                     .map(l -> new LoteLaminaProtocoloDto(l.getProtocolo(), l.getStatus()))
                     .toList();
         }
-        return List.of();
+        return null;
     }
 }
-

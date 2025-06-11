@@ -272,11 +272,11 @@ public class HomeController {
                                 <h3>Recursos Principais</h3>
                                 <ul>
                                     <li>Gestão de amostras biológicas (flebotomíneos, escorpiões, triatomíneos, moluscos, larvas)</li>
-                                    <li>Controle de lotes e rastreabilidade</li>
-                                    <li>Validações por tipo de amostra e região</li>
+                                    <li>Controle de lotes</li>
+                                    <li>Validações por tipo de amostra</li>
                                     <li>Emissão de laudos técnicos</li>
                                     <li>Fluxo completo de amostras</li>
-                                    <li>Notificações em tempo real</li>
+                                    <li>Conformes as normas LGPD</li>
                                 </ul>
                             </div>
                            
@@ -288,11 +288,11 @@ public class HomeController {
                                 </div>
                                 <div class="key-value">
                                     <div class="key">Backend:</div>
-                                    <div class="value">Java 21 com Spring Boot 3.2.3</div>
+                                    <div class="value">Java 17 com Spring Boot 3.2.3</div>
                                 </div>
                                 <div class="key-value">
                                     <div class="key">Banco:</div>
-                                    <div class="value">MySQL 8</div>
+                                    <div class="value">MySQL / H2</div>
                                 </div>
                                 <div class="key-value">
                                     <div class="key">Autenticação:</div>

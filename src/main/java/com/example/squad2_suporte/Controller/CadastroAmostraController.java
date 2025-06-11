@@ -7,6 +7,8 @@ import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
 import com.example.squad2_suporte.dto.amostra.ProtocoloListaAmostraDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoEscorpiaoDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.RetornoIdAmostras;
+import com.example.squad2_suporte.enuns.StatusAmostra;
+import com.example.squad2_suporte.enuns.TipoAmostra;
 import com.example.squad2_suporte.service.AmostraService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +19,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -527,5 +532,67 @@ public class CadastroAmostraController {
     public ResponseEntity<?> anonimizarAmostra(@PathVariable String protocolo, @RequestParam("tipo") String tipoAnonimização) {
         var amostraAnonimizada = amostraService.anonimizarAmostra(protocolo, tipoAnonimização);
         return ResponseEntity.ok(amostraAnonimizada);
+    }
+
+    @Operation(
+            summary = "Filtrar Amostras",
+            description = "Método para filtrar amostras por tipo, status e município, com suporte a paginação",
+            tags = "Gerenciar Amostras"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de amostras filtradas retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ProtocoloListaAmostraDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Nenhuma amostra encontrada com os filtros fornecidos",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Parâmetros de filtro inválidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Erro 400 - Tipo de amostra inválido",
+                                            value = """
+                                            {
+                                              "mensagem": "Tipo de amostra inválido",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                            """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Erro 400 - Status inválido",
+                                            value = """
+                                            {
+                                              "mensagem": "Status de amostra inválido",
+                                              "status": "BAD_REQUEST"
+                                            }
+                                            """
+                                    )
+                            }
+                    )
+            )
+    })
+    @GetMapping("/filtrar")
+    public ResponseEntity<Page<ProtocoloListaAmostraDto>> filtrarAmostras(
+            @RequestParam(value = "tipoAmostra", required = false) TipoAmostra tipoAmostra,
+            @RequestParam(value = "status", required = false) StatusAmostra status,
+            @RequestParam(value = "municipio", required = false) String municipio,
+            @RequestParam(value = "pagina", defaultValue = "0") int page,
+            @RequestParam(value = "tamanho", defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProtocoloListaAmostraDto> amostras = amostraService.filtrarAmostras(tipoAmostra, status, municipio, pageable);
+        if (amostras.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+        return ResponseEntity.ok(amostras); // 200 OK com a página de resultados
     }
 }

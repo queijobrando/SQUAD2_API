@@ -2,6 +2,7 @@ package com.example.squad2_suporte.lote;
 
 import com.example.squad2_suporte.Amostras.Amostra;
 import com.example.squad2_suporte.Lamina.Lamina;
+import com.example.squad2_suporte.enuns.TipoLote;
 import com.example.squad2_suporte.enuns.StatusLote;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,10 @@ public class Lote {
 
     @Column(unique = true)
     private String protocolo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoLote tipo; // Referencia o enum separado
 
     @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL)
     private List<Amostra> amostras = new ArrayList<>();

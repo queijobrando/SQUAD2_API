@@ -24,6 +24,9 @@ public class AuditLog {
     private String action;
 
     @Column
+    private String resourceType; // Novo campo para identificar o tipo de recurso (ex.: "LOTE")
+
+    @Column
     private String resourceId;
 
     @Column
