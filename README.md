@@ -1,101 +1,103 @@
+# 🧪 Portal LACEN - API de Envio de Amostras
 
-## 🌳 Estrutura de Branches
+Projeto desenvolvido pelo **Squad 2** para a Fundação de Saúde Parreiras Horta (FSPH).  
+Esta API gerencia o cadastro, envio e controle de amostras biológicas enviadas pelas prefeituras para o LACEN/SE.
 
-- `main`: código estável e pronto para produção (🚫 ninguém comita diretamente aqui)
-- `develop`: onde as funcionalidades são integradas após revisão
-- `feature/nome-da-tarefa`: onde cada pessoa trabalha em uma funcionalidade específica
+Este projeto é uma API RESTful desenvolvida com **Spring Boot**, voltada para o gerenciamento de **lotes**, **amostras** e **lâminas** em um fluxo laboratorial. O sistema oferece funcionalidades completas, controle de acesso com JWT, verificação de integridade, upload e download de laudos, além de respeitar os princípios da **LGPD**.
 
 ---
 
-## 🚀 Começando uma nova tarefa
+## ⚙️ Tecnologias Utilizadas
 
+- **Java 17+**
+- **Spring Boot**
+- **Spring Security**
+- **JWT (JSON Web Token)** – autenticação com token
+- **JPA / Hibernate**
+- **H2 Database** - Banco de teste em memória
+- **MySQL** – banco de dados
+- **Swagger UI** – com interface personalizada para documentação
+- **Lombok**
+- **MapStruct**
+
+---
+
+## 🔐 Autenticação
+
+A autenticação é feita por meio de **token JWT**. Após o login, o token deve ser utilizado nos headers (`Authorization: Bearer <token>`) para acessar endpoints protegidos.
+
+---
+
+## 📦 Funcionalidades Principais
+
+### 🔹 Lotes
+- Criar um novo lote
+- Lote pode conter **apenas amostras** ou **apenas lâminas**
+- Buscar lote por protocolo
+- Buscar todos os lotes
+- Editar lote (adicionar/remover amostras ou lâminas)
+- Atualizar status do lote
+- Excluir lote
+- Gerar relatório do lote (PDF)
+
+### 🔹 Amostras
+- Criar amostras de diferentes tipos (Escorpião, Flebotomíneo, Triatomíneo, etc.)
+- Associar e remover amostras de um lote
+- Enviar laudo PDF
+- Fazer download do laudo
+- Atualizar status da amostra
+- Verificação de integridade
+- Geração automática de protocolo
+
+### 🔹 Lâminas
+- Criar lâminas
+- Associar e remover lâminas de um lote
+- Enviar laudo PDF
+- Fazer download do laudo
+- Atualizar status da lâmina
+- Verificação de integridade
+- Geração automática de protocolo
+
+---
+
+## 🔒 Conformidade com a LGPD
+
+O sistema foi projetado seguindo os princípios da **Lei Geral de Proteção de Dados (LGPD)**:
+
+- Dados pessoais sensíveis são armazenados de forma segura
+- Somente usuários autenticados podem acessar dados protegidos
+- Logs e rastreamento de ações importantes
+
+---
+
+## 📄 Documentação da API
+
+A documentação completa está disponível via Swagger:
+
+> Acesse: `http://localhost:8080/swagger-ui/index.html`
+
+A interface Swagger foi **personalizada** para melhor navegação e visualização dos recursos.
+
+---
+
+## Endpoints Documentados
+
+Link do documento contendo todos os enpoints para utilizar a API:
+
+> Acesse: `https://docs.google.com/document/d/1ttcpvTfUjaORzU-16qTqLAmNPquedhVSLa5vs_SzVDk/edit?tab=t.0`
+
+
+---
+
+## ▶️ Como executar
+
+### Pré-requisitos:
+- Java 17+
+- Maven
+- MySQL
+
+### Passos:
 ```bash
-# Atualize sua branch develop local
-git checkout develop
-git pull origin develop
-
-# Crie sua branch de tarefa a partir de develop
-git checkout -b feature/nome-da-tarefa
-
-# Exemplo:
-# git checkout -b feature/cadastro-usuario
-```
-
----
-
-## 💻 Trabalhando na sua branch
-
-```bash
-# Após fazer mudanças no código
-git add .
-git commit -m "Implementa [descrição da tarefa]"
-
-# Envie sua branch para o GitHub
-git push origin feature/nome-da-tarefa
-```
-
----
-
-## 🔁 Criando um Pull Request (PR)
-
-1. Vá até o repositório no GitHub.
-2. Clique em **"Compare & pull request"** ou vá na aba **Pull Requests**.
-3. Selecione:
-    - **Base**: `develop`
-    - **Compare**: `feature/nome-da-tarefa`
-4. Descreva o que foi feito e envie para revisão.
-5. Aguarde aprovação e merge.
-
----
-
-## 🔄 Mantendo sua branch atualizada
-
-Se alguém já tiver dado merge em `develop`, atualize a sua:
-
-```bash
-# Atualize develop
-git checkout develop
-git pull origin develop
-
-# Volte para sua feature branch
-git checkout feature/nome-da-tarefa
-
-# Mescle as mudanças da develop na sua branch
-git merge develop
-
-# Resolva conflitos, se houver, e continue trabalhando normalmente
-```
-
----
-
-## ✅ Finalizando
-
-Quando a branch `develop` estiver com várias funcionalidades testadas e estável, um responsável faz o merge dela para `main` via Pull Request:
-
-```bash
-git checkout main
-git pull origin main
-git merge develop
-git push origin main
-```
-
----
-
-## 📌 Regras importantes
-
-- 🔒 **Nunca comitar direto em `main` ou `develop`**
-- ✅ **Sempre trabalhe em branches `feature/*`**
-- 🔄 **Atualize sua branch com `develop` com frequência**
-- 🧪 **Teste antes de pedir merge**
-- 🧠 **Nomeie bem seus commits e branches**
-
----
-
-👥 Time colaborando com responsabilidade = projeto saudável 🚀
-
-
-## 📖 Documentação Swagger
-`http://localhost:8080/swagger-ui.html`
-
-## BANCO H2
-`http://localhost:8080/h2-console/`
+git clone https://github.com/seu-usuario/seu-repositorio.git
+cd seu-repositorio
+./mvnw spring-boot:run
