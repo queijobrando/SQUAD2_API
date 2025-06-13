@@ -2,7 +2,6 @@ package com.example.squad2_suporte.Amostras;
 
 import com.example.squad2_suporte.Amostras.endereco.Endereco;
 import com.example.squad2_suporte.Classes.*;
-import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.enuns.StatusAmostra;
 import com.example.squad2_suporte.enuns.TipoAmostra;
 import com.example.squad2_suporte.lote.Lote;
@@ -13,7 +12,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "amostra")
@@ -36,38 +34,37 @@ import java.time.LocalDateTime;
         @JsonSubTypes.Type(value = Larvas.class, name = "LARVA")
 })
 public abstract class Amostra {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
+    private Long id;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(nullable = false)
-  private Long id;
+    @Column(nullable = false)
+    private LocalDateTime dataHora;
 
-  @Column(nullable = false)
-  private LocalDateTime dataHora;
+    @Column(unique = true)
+    private String protocolo;
 
-  @Column(unique = true)
-  private Long protocolo;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusAmostra status;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private StatusAmostra status;
+    @Embedded
+    private Endereco endereco;
 
-  @Embedded
-  private Endereco endereco;
+    @Enumerated(EnumType.STRING)
+    @JsonIgnore
+    private TipoAmostra tipoAmostra;
 
-  @Enumerated(EnumType.STRING)
-  @JsonIgnore // O JsonSubTypes vai ignorar quando retornar em formato json (evitar dois campos repetidos)
-  private TipoAmostra tipoAmostra; // tipo da amostra (ele é setado automaticamente no tipo correspondente)
+    @ManyToOne
+    @JoinColumn(name = "lote_id")
+    @JsonIgnore
+    private Lote lote;
 
-  @ManyToOne
-  @JoinColumn(name = "lote_id") // Amostra pode ou não ter um lote
-  @JsonIgnore
-  private Lote lote;
+    @Lob
+    @Column(columnDefinition = "BLOB")
+    private byte[] laudo;
 
-  @PrePersist
-  public void gerarProtocolo(){
-    this.protocolo = System.currentTimeMillis();
-    this.status = StatusAmostra.PENDENTE;
-  }
+    @Column
+    private String baseLegal; // Novo campo para LGPD
 }
-

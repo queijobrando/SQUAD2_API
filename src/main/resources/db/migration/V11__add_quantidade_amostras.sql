@@ -1,0 +1,1 @@
+ALTER TABLE envio_amostras ADD quantidade_amostras INT NOT NULL DEFAULT 1;

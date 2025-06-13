@@ -7,6 +7,7 @@ import com.example.squad2_suporte.config.exceptions.RequisicaoInvalidaException;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -34,6 +35,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LoteInvalidoException.class)
     public ResponseEntity<RestErrorMessage> handleLoteInvalid(LoteInvalidoException ex) {
+        RestErrorMessage error = new RestErrorMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<RestErrorMessage> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        // Pega a primeira mensagem de erro da lista de violações
+        String errorMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("Dados inválidos");
+        RestErrorMessage error = new RestErrorMessage(errorMessage, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<RestErrorMessage> handleIllegalArgumentException(IllegalArgumentException ex) {
         RestErrorMessage error = new RestErrorMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }

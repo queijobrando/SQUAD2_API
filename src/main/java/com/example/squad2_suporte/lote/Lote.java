@@ -1,12 +1,13 @@
 package com.example.squad2_suporte.lote;
 
 import com.example.squad2_suporte.Amostras.Amostra;
+import com.example.squad2_suporte.Lamina.Lamina;
+import com.example.squad2_suporte.enuns.TipoLote;
 import com.example.squad2_suporte.enuns.StatusLote;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +25,17 @@ public class Lote {
     private Long id;
 
     @Column(unique = true)
-    private Long protocolo;
+    private String protocolo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoLote tipo; // Referencia o enum separado
 
     @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL)
     private List<Amostra> amostras = new ArrayList<>();
+
+    @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL)
+    private List<Lamina> laminas = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -36,11 +44,4 @@ public class Lote {
     @Column(nullable = false)
     private LocalDateTime dataCriacao;
 
-    @PrePersist
-    public void gerarProtocolo() {
-        //gerar número com base no timestamp
-        this.protocolo = System.currentTimeMillis();
-        this.statusLote = StatusLote.PENDENTE;
-        this.dataCriacao = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-    }
 }

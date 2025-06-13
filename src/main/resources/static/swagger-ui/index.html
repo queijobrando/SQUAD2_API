@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API LACEN - Fundação de Saúde Parreiras Horta</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #1e3a8a;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Header superior com informações de contato */
+        .top-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 0.75rem 0;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .top-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .contact-item i {
+            font-size: 0.9rem;
+            color: #fbbf24;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #fbbf24;
+        }
+
+        /* Header principal */
+        .main-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .main-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, #fbbf24 33%, #10b981 33%, #10b981 66%, #dbeafe 66%);
+        }
+
+        .main-header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo-fsph img {
+            height: 50px;
+            width: auto;
+        }
+
+        .logo-sergipe {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-item i {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #fbbf24;
+        }
+
+        .auth-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            min-width: 300px;
+        }
+
+        .server-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .server-select:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .server-select option {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        .auth-btn, .links-btn {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .auth-btn {
+            background: #ffffff;
+            color: #1e3a8a;
+            border: 2px solid #1e3a8a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-btn:hover {
+            background: #1e3a8a;
+            color: #fbbf24;
+            border-color: #fbbf24;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .links-btn {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .links-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: scale(0);
+            animation: rippleEffect 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: #1e3a8a;
+            color: white;
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+
+        .version-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #fbbf24;
+            color: #1e3a8a;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Container principal */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin: -4rem auto 4rem;
+            max-width: 1200px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(30,58,138,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-color: rgba(30,58,138,0.3);
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        /* Seção de Controladores */
+        .controllers-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(to right, #fbbf24, #1e3a8a);
+            border-radius: 2px;
+        }
+
+        .controller-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .controller-card {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+
+        .controller-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            border-color: #1e3a8a;
+        }
+
+        .controller-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            min-height: 60px;
+        }
+
+        .controller-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .controller-toggle {
+            font-size: 1rem;
+            color: #64748b;
+            transition: transform 0.3s ease;
+        }
+
+        .controller-toggle.rotated {
+            transform: rotate(180deg);
+        }
+
+        .endpoint-list {
+            max-height: 0;
+            padding: 0 1.5rem;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding-bottom 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+        }
+
+        .endpoint-list.active {
+            padding-bottom: 1rem;
+            opacity: 1;
+        }
+
+        .endpoint-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-item:hover {
+            background: #e5e7eb;
+            border-color: #1e3a8a;
+        }
+
+        .method {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .method.get { background: #1e3a8a; }
+        .method.post { background: #10b981; }
+        .method.put { background: #f59e0b; }
+        .method.delete { background: #ef4444; }
+
+        .endpoint-details {
+            flex: 1;
+        }
+
+        .endpoint-name {
+            font-size: 0.9rem;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .endpoint-description {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.2rem;
+        }
+
+        .endpoint-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 0.4rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+        }
+
+        .action-btn:hover {
+            background: #1e3a8a;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .action-btn i {
+            font-size: 0.8rem;
+        }
+
+        /* Campo de busca */
+        .search-container {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.4rem 1.5rem 1.4rem 3rem; /* Adjusted left padding to accommodate icon */
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 1.2rem;
+            pointer-events: none; /* Prevents the icon from being clickable */
+        }
+
+        /* Schemas Section */
+        .schemas-section {
+            margin-bottom: 3rem;
+        }
+
+        .schemas-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .schema-card {
+            background: white;
+            border: 1px solid rgba(30,58,138,0.1);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100px;
+        }
+
+        .schema-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            border-color: rgba(30,58,138,0.3);
+        }
+
+        .schema-name {
+            font-size: 1.275rem;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .schema-icon {
+            font-size: 1rem;
+            color: #64748b;
+            transition: transform 0.3s ease;
+        }
+
+        .schema-card:hover .schema-icon {
+            transform: translateX(5px);
+            color: #1e3a8a;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e0f0;
+        }
+
+        .modal-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .close {
+            color: #64748b;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #dc2626;
+        }
+
+        .modal-body {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .modal-body pre {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .test-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .test-form label {
+            font-weight: 500;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .required::after {
+            content: '*';
+            color: #ef4444;
+            font-size: 1rem;
+        }
+
+        .test-form input,
+        .test-form textarea,
+        .test-form select {
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .test-form input:focus,
+        .test-form textarea:focus,
+        .test-form select:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+
+        .test-form input:invalid,
+        .test-form textarea:invalid,
+        .test-form select:invalid {
+            border-color: #ef4444;
+        }
+
+        .test-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .test-form button {
+            background: #1e3a8a;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-form button:hover {
+            background: #14307d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .test-form .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .schema-btn {
+            background: #10b981;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .schema-btn:hover {
+            background: #0a8f66;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .schema-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .response-section {
+            margin-top: 1.5rem;
+        }
+
+        .response-section h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .auth-form label {
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .auth-form select,
+        .auth-form input {
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .auth-form select:focus,
+        .auth-form input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+
+        .auth-form button {
+            background: #1e3a8a;
+            color: white;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-form button:hover {
+            background: #14307d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
+            transform: translateX(100%);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: #1e3a8a;
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: #fbbf24;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #f59e0b;
+        }
+
+        .footer-info {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .top-header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .auth-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+                min-width: auto;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .controller-list {
+                grid-template-columns: 1fr;
+            }
+
+            .schemas-list {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 2% auto;
+                padding: 1.5rem;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .search-input {
+                font-size: 0.9rem;
+                padding: 0.8rem 1rem 0.8rem 2.5rem; /* Adjusted for smaller screens */
+            }
+
+            .search-icon {
+                font-size: 1rem;
+                left: 0.8rem;
+            }
+        }
+
+        /* Animações */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header superior com informações de contato -->
+    <div class="top-header">
+        <div class="top-header-content">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+55 79 3234-6010</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>ouvidoria.fsph@fsph.se.gov.br</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Av. Prof. José Bonifácio Fortes Neto, 400 - Aracaju/SE</span>
+                </div>
+            </div>
+            <button class="close-btn" onclick="closeTopHeader()" aria-label="Fechar informações de contato" title="Fechar informações de contato">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Header principal -->
+    <header class="main-header">
+        <div class="main-header-content">
+            <div class="logo-section">
+                <div class="logo-fsph">
+                    <img src="https://fsph.se.gov.br/assets/img/fsph_logoLAzul.png" alt="FSPH Logo">
+                </div>
+                <div class="logo-sergipe">SE</div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="https://fsph.se.gov.br/about.html" target="_blank" rel="noopener" class="nav-item"><i class="fas fa-building"></i> FUNDAÇÃO</a>
+                <a href="#" class="nav-item active"><i class="fas fa-code"></i> API LACEN</a>
+                <a href="https://fsph.se.gov.br/blog.html" target="_blank" rel="noopener" class="nav-item"><i class="fas fa-newspaper"></i> NOTÍCIAS</a>
+                <a href="https://fsph.se.gov.br/institucional.html" target="_blank" rel="noopener" class="nav-item"><i class="fas fa-file-alt"></i> TRANSPARÊNCIA</a>
+            </nav>
+
+            <div class="auth-controls">
+                <label for="serverSelect" class="visually-hidden">Selecionar servidor da API</label>
+                <select class="server-select" id="serverSelect" title="Selecionar servidor da API" onchange="updateBaseUrl()">
+                    <option value="local">API - Servidor local</option>
+                    <option value="dev">API - Desenvolvimento</option>
+                    <option value="prod">API - Produção</option>
+                </select>
+                <button class="auth-btn" onclick="openAuthModal()"><i class="fas fa-lock"></i> Authorize</button>
+                <button class="links-btn" onclick="showUsefulLinks()"><i class="fas fa-link"></i> LINKS ÚTEIS</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="version-info">
+                    <i class="fas fa-code"></i>
+                    <span>API LACEN v1.0.0 - OAS 3.0</span>
+                </div>
+                <h1 class="hero-title slide-in">API LACEN</h1>
+                <p class="hero-subtitle slide-in">
+                    Sistema de gerenciamento de amostras biológicas coletadas pelos municípios e enviadas ao LACEN
+                </p>
+                <a href="#controllers" class="cta-button slide-in"><i class="fas fa-rocket"></i> Explorar a API</a>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card fade-in">
+                <div class="stat-number" id="controllerCount">0</div>
+                <div class="stat-label">Controladores</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number" id="endpointCount">0</div>
+                <div class="stat-label">Endpoints</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number" id="modelCount">0</div>
+                <div class="stat-label">Modelos</div>
+            </div>
+            <div class="stat-card fade-in">
+                <div class="stat-number" id="docPercentage">0</div>
+                <div class="stat-label">Documentados</div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Pesquisar endpoints..." onkeyup="filterEndpoints()">
+                </div>
+            </div>
+
+            <!-- Controllers Section -->
+            <section class="controllers-section" id="controllers">
+                <h2 class="section-title fade-in">Controladores</h2>
+                <div class="controller-list" id="controllersList"></div>
+            </section>
+
+            <!-- Schemas Section -->
+            <section class="schemas-section" id="schemas">
+                <h2 class="section-title fade-in">Schemas</h2>
+                <div class="schemas-list" id="schemasList">
+                    <!-- Schemas gerados dinamicamente -->
+                    <div class="schema-card fade-in" data-schema="amostraDto">
+                        <h3 class="schema-name">AmostraDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="protocoloAmostraDto">
+                        <h3 class="schema-name">ProtocoloAmostraDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="protocoloListaAmostraDto">
+                        <h3 class="schema-name">ProtocoloListaAmostraDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="retornoEscorpiaoDto">
+                        <h3 class="schema-name">RetornoEscorpiaoDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="retornoIdAmostras">
+                        <h3 class="schema-name">RetornoIdAmostras</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="laminaDto">
+                        <h3 class="schema-name">LaminaDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="retornoLaminaDto">
+                        <h3 class="schema-name">RetornoLaminaDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="loteDto">
+                        <h3 class="schema-name">LoteDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="editarLoteDto">
+                        <h3 class="schema-name">EditarLoteDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                    <div class="schema-card fade-in" data-schema="retornoLoteDto">
+                        <h3 class="schema-name">RetornoLoteDto</h3>
+                        <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="https://fsph.se.gov.br/about.html" target="_blank" rel="noopener">Sobre</a>
+                <a href="https://fsph.se.gov.br/blog.html" target="_blank" rel="noopener">Notícias</a>
+                <a href="https://fsph.se.gov.br/institucional.html" target="_blank" rel="noopener">Transparência</a>
+            </div>
+            <div class="footer-info">
+                <p>Fundação de Saúde Parreiras Horta © 2025 | Av. Prof. José Bonifácio Fortes Neto, 400 - Aracaju/SE</p>
+                <p>Email: ouvidoria.fsph@fsph.se.gov.br | Telefone: +55 79 3234-6010</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal para Autenticação -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Autorizar Acesso</h2>
+                <span class="close" onclick="closeAuthModal()">×</span>
+            </div>
+            <div class="auth-form">
+                <label for="authType">Tipo de Autenticação:</label>
+                <select id="authType">
+                    <option value="bearer">Bearer Token</option>
+                    <option value="apiKey">API Key</option>
+                </select>
+                <label for="authValue">Valor:</label>
+                <input type="text" id="authValue" placeholder="Insira o token ou chave API" required />
+                <button onclick="submitAuth()">Autorizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Testar Endpoint -->
+    <div id="testModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Testar Endpoint</h2>
+                <span class="close" onclick="closeTestModal()">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="test-form" id="testForm"></div>
+                <div class="response-section" id="responseSection" style="display: none;">
+                    <h4>Resposta:</h4>
+                    <pre id="responseOutput"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Visualizar Schema -->
+    <div id="schemaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="schemaModalTitle"></h2>
+                <span class="close" onclick="closeSchemaModal()">×</span>
+            </div>
+            <div class="modal-body">
+                <pre id="schemaContent"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let baseUrl = 'http://localhost:8080';
+        let authToken = null;
+        let authType = 'bearer';
+        let currentEndpointSchema = null;
+
+        function getBaseUrl(server) {
+            switch(server) {
+                case 'local': return 'http://localhost:8080';
+                case 'dev': return 'https://api-dev.lacen.se.gov.br';
+                case 'prod': return 'https://api.lacen.se.gov.br';
+                default: return 'http://localhost:8080';
+            }
+        }
+
+        function updateBaseUrl() {
+            const server = document.getElementById('serverSelect').value;
+            baseUrl = getBaseUrl(server);
+            showNotification(`Servidor alterado para: ${server}`, 'success');
+            loadAndRenderData();
+        }
+
+        function closeTopHeader() {
+            document.querySelector('.top-header').style.display = 'none';
+        }
+
+        function openAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'block';
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.style.display = 'none';
+        }
+
+        function submitAuth() {
+            const authValue = document.getElementById('authValue').value;
+            authType = document.getElementById('authType').value;
+            if (authValue) {
+                authToken = authValue;
+                closeAuthModal();
+                showNotification('Autorização bem-sucedida!', 'success');
+                document.querySelector('.auth-btn').innerHTML = '<i class="fas fa-unlock"></i> Autorizado';
+                loadAndRenderData();
+            } else {
+                showNotification('Por favor, insira um token ou chave API válida.', 'info');
+            }
+        }
+
+        function showUsefulLinks() {
+            showNotification('Links úteis: Em breve mais funcionalidades!', 'info');
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        async function loadOpenAPISpec() {
+            try {
+                const headers = {
+                    'Accept': 'application/json'
+                };
+                if (authToken) {
+                    if (authType === 'bearer') {
+                        headers['Authorization'] = `Bearer ${authToken}`;
+                    } else {
+                        headers['X-API-Key'] = authToken;
+                    }
+                }
+                const response = await fetch(`${baseUrl}/v3/api-docs`, { headers });
+                return await response.json();
+            } catch (error) {
+                console.error('Erro ao carregar especificação OpenAPI:', error);
+                showNotification('Erro ao carregar a especificação OpenAPI.', 'info');
+                return null;
+            }
+        }
+
+        function renderEndpoints(spec) {
+            const controllersList = document.getElementById('controllersList');
+            controllersList.innerHTML = '';
+
+            const controllers = {};
+
+            for (const path in spec.paths) {
+                for (const method in spec.paths[path]) {
+                    const endpoint = spec.paths[path][method];
+                    const tags = endpoint.tags || ['default'];
+
+                    tags.forEach(tag => {
+                        if (!controllers[tag]) {
+                            controllers[tag] = [];
+                        }
+                        controllers[tag].push({
+                            path,
+                            method: method.toUpperCase(),
+                            summary: endpoint.summary || '',
+                            description: endpoint.description || '',
+                            parameters: endpoint.parameters || [],
+                            requestBody: endpoint.requestBody || null,
+                            contentTypes: endpoint.requestBody ? Object.keys(endpoint.requestBody.content || {}) : []
+                        });
+                    });
+                }
+            }
+
+            for (const controllerName in controllers) {
+                const endpoints = controllers[controllerName];
+                const controllerCard = document.createElement('div');
+                controllerCard.className = 'controller-card';
+                controllerCard.setAttribute('data-controller', controllerName.toLowerCase());
+
+                controllerCard.innerHTML = `
+                    <div class="controller-header">
+                        <h3 class="controller-name">${controllerName}</h3>
+                        <span class="controller-toggle"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="endpoint-list"></div>
+                `;
+
+                controllerCard.querySelector('.controller-header').onclick = function(e) {
+                    toggleEndpointList(this);
+                };
+
+                const endpointList = controllerCard.querySelector('.endpoint-list');
+
+                endpoints.forEach(endpoint => {
+                    const endpointItem = document.createElement('div');
+                    endpointItem.className = 'endpoint-item';
+                    endpointItem.setAttribute('data-path', endpoint.path.toLowerCase());
+                    endpointItem.setAttribute('data-method', endpoint.method.toLowerCase());
+                    endpointItem.setAttribute('data-summary', endpoint.summary.toLowerCase());
+                    endpointItem.setAttribute('data-description', endpoint.description.toLowerCase());
+
+                    endpointItem.innerHTML = `
+                        <span class="method ${endpoint.method.toLowerCase()}">${endpoint.method}</span>
+                        <div class="endpoint-details">
+                            <span class="endpoint-name">${endpoint.summary}</span>
+                            <p class="endpoint-description">${endpoint.description}</p>
+                        </div>
+                        <div class="endpoint-actions">
+                            <button class="action-btn" onclick='testEndpoint("${controllerName}", "${endpoint.path}", "${endpoint.method}")' title="Testar endpoint">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    endpointItem.onclick = function(e) {
+                        if (e.target.closest('.action-btn')) return;
+                        testEndpoint(controllerName, endpoint.path, endpoint.method);
+                    };
+
+                    endpointList.appendChild(endpointItem);
+                });
+
+                controllersList.appendChild(controllerCard);
+            }
+        }
+
+        function toggleEndpointList(header) {
+            const endpointList = header.nextElementSibling;
+            const toggleIcon = header.querySelector('.controller-toggle i');
+            const isActive = endpointList.classList.contains('active');
+
+            if (!isActive) {
+                endpointList.style.display = 'block';
+                const fullHeight = endpointList.scrollHeight + 16;
+                endpointList.style.display = '';
+                endpointList.style.maxHeight = fullHeight + 'px';
+                endpointList.classList.add('active');
+            } else {
+                endpointList.style.maxHeight = '0px';
+                endpointList.classList.remove('active');
+            }
+
+            toggleIcon.classList.toggle('fa-chevron-down');
+            toggleIcon.classList.toggle('fa-chevron-up');
+        }
+
+        function filterEndpoints() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const endpointItems = document.querySelectorAll('.endpoint-item');
+
+            endpointItems.forEach(item => {
+                const path = item.getAttribute('data-path');
+                const method = item.getAttribute('data-method');
+                const summary = item.getAttribute('data-summary');
+                const description = item.getAttribute('data-description');
+                const controller = item.closest('.controller-card').getAttribute('data-controller');
+
+                const matches = path.includes(searchTerm) ||
+                               method.includes(searchTerm) ||
+                               summary.includes(searchTerm) ||
+                               description.includes(searchTerm) ||
+                               controller.includes(searchTerm);
+
+                item.style.display = matches ? '' : 'none';
+
+                const controllerCard = item.closest('.controller-card');
+                const visibleEndpoints = controllerCard.querySelectorAll('.endpoint-item[style=""]');
+                controllerCard.style.display = visibleEndpoints.length > 0 ? '' : 'none';
+
+                const endpointList = controllerCard.querySelector('.endpoint-list');
+                if (endpointList.classList.contains('active')) {
+                    endpointList.style.display = 'block';
+                    const fullHeight = endpointList.scrollHeight + 16;
+                    endpointList.style.display = '';
+                    endpointList.style.maxHeight = fullHeight + 'px';
+                }
+            });
+        }
+
+        async function testEndpoint(controllerName, path, method) {
+            const spec = await loadOpenAPISpec();
+            if (!spec) {
+                showNotification('Erro ao carregar a especificação OpenAPI.', 'info');
+                return;
+            }
+
+            const endpoint = spec.paths[path][method.toLowerCase()];
+            if (!endpoint) return;
+
+            const form = document.getElementById('testForm');
+            form.innerHTML = `
+                <h3>${method.toUpperCase()} ${path}</h3>
+                <p><strong>Sumário:</strong> ${endpoint.summary || 'N/A'}</p>
+                <p><strong>Descrição:</strong> ${endpoint.description || 'N/A'}</p>
+            `;
+
+            if (endpoint.parameters && endpoint.parameters.length > 0) {
+                endpoint.parameters.forEach(param => {
+                    const inputDiv = document.createElement('div');
+                    const paramType = param.schema?.type || 'string';
+                    const pattern = paramType === 'integer' ? '[0-9]+' : '.*';
+                    inputDiv.innerHTML = `
+                        <label class="${param.required ? 'required' : ''}" for="param-${param.name}">
+                            ${param.name} (${param.in}${param.required ? ', required' : ''}):
+                        </label>
+                        <input type="text" id="param-${param.name}" 
+                               placeholder="Digite o valor para ${param.name}" 
+                               ${param.required ? 'required' : ''} 
+                               pattern="${pattern}"
+                               title="${paramType === 'integer' ? 'Digite apenas números inteiros' : 'Digite um valor válido'}"
+                               value="${param.example || ''}" />
+                    `;
+                    form.appendChild(inputDiv);
+                });
+            }
+
+            if (endpoint.requestBody) {
+                const content = endpoint.requestBody.content || {};
+                const contentTypes = Object.keys(content);
+                const isMultipart = contentTypes.includes('multipart/form-data');
+
+                if (isMultipart) {
+                    const inputDiv = document.createElement('div');
+                    inputDiv.innerHTML = `
+                        <label class="required" for="fileUpload">Arquivo (PDF, required):</label>
+                        <input type="file" id="fileUpload" accept=".pdf" required />
+                    `;
+                    form.appendChild(inputDiv);
+                } else {
+                    const schema = content['application/json']?.schema || {};
+                    const examples = content['application/json']?.examples || {};
+
+                    currentEndpointSchema = schema;
+
+                    let exampleOptions = '';
+                    for (const exampleName in examples) {
+                        exampleOptions += `<option value="${exampleName}">${exampleName}</option>`;
+                    }
+
+                    const bodyDiv = document.createElement('div');
+                    bodyDiv.innerHTML = `
+                        ${exampleOptions ? `
+                            <label for="exampleSelect">Selecionar Exemplo:</label>
+                            <select id="exampleSelect" onchange="loadExample()">
+                                <option value="">-- Selecione um exemplo --</option>
+                                ${exampleOptions}
+                            </select>
+                        ` : ''}
+                        <label for="requestBody">Corpo da Requisição (${contentTypes.join(', ')}):</label>
+                        <textarea id="requestBody" placeholder="Insira o corpo da requisição (JSON, etc.)"></textarea>
+                    `;
+                    form.appendChild(bodyDiv);
+
+                    form.dataset.examples = JSON.stringify(examples);
+                }
+            } else {
+                currentEndpointSchema = null;
+            }
+
+            const buttonDiv = document.createElement('div');
+            buttonDiv.className = 'button-group';
+            buttonDiv.innerHTML = `
+                <button onclick="executeTest('${path}', '${method}')">Testar</button>
+                <button class="schema-btn" onclick="viewEndpointSchema()" ${!currentEndpointSchema ? 'disabled' : ''}>Schemas</button>
+            `;
+            form.appendChild(buttonDiv);
+
+            document.getElementById('responseSection').style.display = 'none';
+            document.getElementById('testModal').style.display = 'block';
+        }
+
+        function viewEndpointSchema() {
+            if (!currentEndpointSchema) {
+                showNotification('Nenhum schema disponível para este endpoint.', 'info');
+                return;
+            }
+            document.getElementById('schemaModalTitle').textContent = 'Schema: Corpo da Requisição';
+            document.getElementById('schemaContent').textContent = JSON.stringify(currentEndpointSchema, null, 2);
+            document.getElementById('schemaModal').style.display = 'block';
+        }
+
+        function loadExample() {
+            const form = document.getElementById('testForm');
+            const examples = JSON.parse(form.dataset.examples || '{}');
+            const selectedExample = document.getElementById('exampleSelect').value;
+            const textarea = document.getElementById('requestBody');
+
+            if (selectedExample && examples[selectedExample]) {
+                textarea.value = JSON.stringify(examples[selectedExample].value, null, 2);
+            }
+        }
+
+        async function executeTest(path, method) {
+            const spec = await loadOpenAPISpec();
+            const endpoint = spec.paths[path][method.toLowerCase()];
+            const params = {};
+
+            if (endpoint.parameters) {
+                for (const param of endpoint.parameters) {
+                    const input = document.getElementById(`param-${param.name}`);
+                    if (param.required && (!input.value || input.value.trim() === '')) {
+                        showNotification(`O parâmetro ${param.name} é obrigatório.`, 'info');
+                        return;
+                    }
+                    if (input && input.value) {
+                        if (param.schema?.type === 'integer' && !/^\d+$/.test(input.value)) {
+                            showNotification(`O parâmetro ${param.name} deve ser um número inteiro.`, 'info');
+                            return;
+                        }
+                        params[param.name] = input.value;
+                    }
+                }
+            }
+
+            let url = `${baseUrl}${path}`;
+            const queryParams = endpoint.parameters?.filter(p => p.in === 'query') || [];
+            if (queryParams.length > 0) {
+                const queryStrings = queryParams.map(param => {
+                    return params[param.name] ? `${param.name}=${encodeURIComponent(params[param.name])}` : '';
+                }).filter(q => q);
+                if (queryStrings.length > 0) {
+                    url += `?${queryStrings.join('&')}`;
+                }
+            }
+
+            endpoint.parameters?.filter(p => p.in === 'path').forEach(param => {
+                url = url.replace(`{${param.name}}`, params[param.name] || '');
+            });
+
+            let body = null;
+            let contentType = 'application/json';
+            const content = endpoint.requestBody?.content || {};
+            const contentTypes = Object.keys(content);
+            const isMultipart = contentTypes.includes('multipart/form-data');
+
+            if (isMultipart) {
+                const fileInput = document.getElementById('fileUpload');
+                if (!fileInput.files.length) {
+                    showNotification('Por favor, selecione um arquivo PDF.', 'info');
+                    return;
+                }
+                const file = fileInput.files[0];
+                if (file.type !== 'application/pdf') {
+                    showNotification('Apenas arquivos PDF são permitidos.', 'info');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+                body = formData;
+                contentType = false;
+            } else if (endpoint.requestBody) {
+                const textarea = document.getElementById('requestBody');
+                contentType = 'application/json';
+                body = textarea.value;
+
+                if (contentType === 'application/json' && body) {
+                    try {
+                        const requestBody = JSON.parse(body);
+                        const selectedExample = document.getElementById('exampleSelect')?.value || '';
+                        const examples = JSON.parse(document.getElementById('testForm').dataset.examples || '{}');
+                        const expectedType = examples[selectedExample]?.value?.tipoAmostra || null;
+
+                        if (expectedType && requestBody.tipoAmostra && requestBody.tipoAmostra !== expectedType) {
+                            showNotification(`O tipo de amostra '${requestBody.tipoAmostra}' não corresponde ao tipo selecionado '${expectedType}'.`, 'info');
+                            return;
+                        }
+
+                        JSON.parse(body);
+                    } catch (e) {
+                        showNotification('Corpo da requisição deve ser um JSON válido.', 'info');
+                        return;
+                    }
+                }
+            }
+
+            try {
+                const headers = {
+                    'Accept': 'application/json'
+                };
+                if (contentType && !isMultipart) {
+                    headers['Content-Type'] = contentType;
+                }
+                if (authToken) {
+                    if (authType === 'bearer') {
+                        headers['Authorization'] = `Bearer ${authToken}`;
+                    } else {
+                        headers['X-API-Key'] = authToken;
+                    }
+                }
+
+                const response = await fetch(url, {
+                    method: method.toUpperCase(),
+                    headers,
+                    body: body && method.toUpperCase() !== 'GET' ? body : null
+                });
+
+                const contentTypeHeader = response.headers.get('content-type');
+                let responseText;
+                if (contentTypeHeader && contentTypeHeader.includes('application/pdf')) {
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = `laudo-${params.protocolo || 'download'}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(downloadUrl);
+                    responseText = 'Arquivo PDF baixado com sucesso.';
+                } else {
+                    responseText = await response.text();
+                    try {
+                        responseText = JSON.stringify(JSON.parse(responseText), null, 2);
+                    } catch (e) {
+                    }
+                }
+
+                const responseOutput = document.getElementById('responseOutput');
+                responseOutput.textContent = responseText;
+                document.getElementById('responseSection').style.display = 'block';
+                showNotification(`Requisição ${method.toUpperCase()} ${path} executada com sucesso!`, 'success');
+            } catch (error) {
+                document.getElementById('responseOutput').textContent = `Erro: ${error.message}`;
+                document.getElementById('responseSection').style.display = 'block';
+                showNotification(`Erro ao executar ${method.toUpperCase()} ${path}.`, 'info');
+            }
+        }
+
+        function closeTestModal() {
+            document.getElementById('testModal').style.display = 'none';
+            currentEndpointSchema = null;
+        }
+
+        function renderSchemas(spec) {
+            const schemasList = document.getElementById('schemasList');
+            schemasList.innerHTML = '';
+
+            const schemas = spec.components?.schemas || {};
+            for (const schemaName in schemas) {
+                const schema = schemas[schemaName];
+                const schemaCard = document.createElement('div');
+                schemaCard.className = 'schema-card fade-in';
+                schemaCard.setAttribute('data-schema', schemaName.toLowerCase());
+
+                schemaCard.innerHTML = `
+                    <h3 class="schema-name">${schemaName}</h3>
+                    <span class="schema-icon"><i class="fas fa-arrow-right"></i></span>
+                `;
+
+                schemaCard.onclick = () => viewSchema(schemaName, schema);
+                schemasList.appendChild(schemaCard);
+            }
+        }
+
+        function viewSchema(schemaName, schema) {
+            document.getElementById('schemaModalTitle').textContent = `Schema: ${schemaName}`;
+            document.getElementById('schemaContent').textContent = JSON.stringify(schema, null, 2);
+            document.getElementById('schemaModal').style.display = 'block';
+        }
+
+        function closeSchemaModal() {
+            document.getElementById('schemaModal').style.display = 'none';
+        }
+
+        async function updateStats() {
+            const spec = await loadOpenAPISpec();
+            if (!spec) return;
+
+            const controllers = new Set();
+            for (const path in spec.paths) {
+                for (const method in spec.paths[path]) {
+                    const tags = spec.paths[path][method].tags || [];
+                    tags.forEach(tag => controllers.add(tag));
+                }
+            }
+            document.getElementById('controllerCount').textContent = controllers.size;
+
+            let endpointCount = 0;
+            for (const path in spec.paths) {
+                endpointCount += Object.keys(spec.paths[path]).length;
+            }
+            document.getElementById('endpointCount').textContent = endpointCount;
+
+            const modelCount = spec.components && spec.components.schemas ? Object.keys(spec.components.schemas).length : 0;
+            document.getElementById('modelCount').textContent = modelCount;
+
+            let documentedEndpoints = 0;
+            for (const path in spec.paths) {
+                for (const method in spec.paths[path]) {
+                    const endpoint = spec.paths[path][method];
+                    if (endpoint.summary || endpoint.description) {
+                        documentedEndpoints++;
+                    }
+                }
+            }
+            const docPercentage = endpointCount > 0 ? Math.round((documentedEndpoints / endpointCount) * 100) : 0;
+            document.getElementById('docPercentage').textContent = docPercentage + '%';
+        }
+
+        function updateStatsAnimation() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValueText = stat.textContent;
+                const finalValue = parseInt(finalValueText.replace('%', ''));
+                let currentValue = 0;
+                const increment = finalValue / 20;
+
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= finalValue) {
+                        stat.textContent = finalValueText;
+                        clearInterval(timer);
+                    } else {
+                        if (stat.id === 'docPercentage') {
+                            stat.textContent = Math.round(currentValue) + '%';
+                        } else {
+                            stat.textContent = Math.round(currentValue);
+                        }
+                    }
+                }, 50);
+            });
+        }
+
+        async function loadAndRenderData() {
+            const spec = await loadOpenAPISpec();
+            if (spec) {
+                renderEndpoints(spec);
+                renderSchemas(spec);
+                await updateStats();
+                updateStatsAnimation();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAndRenderData();
+
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const slideElements = document.querySelectorAll('.slide-in');
+
+            fadeElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, index * 100);
+            });
+
+            slideElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, index * 150);
+            });
+
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+
+            document.querySelectorAll('.btn, .auth-btn, .links-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+                    this.disabled = true;
+
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = `${size}px`;
+                    ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+                    ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+                    ripple.classList.add('ripple');
+                    this.appendChild(ripple);
+
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 1000);
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                const authModal = document.getElementById('authModal');
+                const testModal = document.getElementById('testModal');
+                const schemaModal = document.getElementById('schemaModal');
+                if (event.target === authModal) {
+                    closeAuthModal();
+                }
+                if (event.target === testModal) {
+                    closeTestModal();
+                }
+                if (event.target === schemaModal) {
+                    closeSchemaModal();
+                }
+            });
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeAuthModal();
+                    closeTestModal();
+                    closeSchemaModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -4,6 +4,7 @@ import com.example.squad2_suporte.Amostras.Amostra;
 import com.example.squad2_suporte.Classes.*;
 import com.example.squad2_suporte.dto.amostra.AmostraDto;
 import com.example.squad2_suporte.dto.amostra.ProtocoloAmostraDto;
+import com.example.squad2_suporte.dto.amostra.ProtocoloListaAmostraDto;
 import com.example.squad2_suporte.dto.lote.LoteProtocoloDto;
 import com.example.squad2_suporte.dto.retornotipoamostras.*;
 import com.example.squad2_suporte.lote.Lote;
@@ -39,16 +40,15 @@ public interface TipoAmostraMapper {
     RetornoFlebotomineosDto flebotomineosEntidadeParaRetorno(Flebotomineos flebotomineos);
 
 
-    //Triatomineos
-    @Mapping(target = "tipoAmostra", constant = "TRIATOMINEOS")
-    @Mapping(target = "dataHora", source = "dataHora", qualifiedByName = "removerSegundos") // herança
-    @Mapping(target = "endereco", source = "enderecoDto") // usando EnderecoMapper
-    Triatomineos amostraDtoParaTriatomineos(AmostraDto dto);
+    // Triatomineos
+@Mapping(target = "tipoAmostra", constant = "TRIATOMINEOS")
+@Mapping(target = "dataHora", source = "dataHora", qualifiedByName = "removerSegundos") // herança
+@Mapping(target = "endereco", source = "enderecoDto") // usando EnderecoMapper
+Triatomineos amostraDtoParaTriatomineos(AmostraDto dto);
 
-    @Mapping(target = "enderecoDto", source = "endereco")
-    @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
-    RetornoTriatomineosDto triatomieosEntidadeParaRetorno(Triatomineos triatomineos);
-
+@Mapping(target = "enderecoDto", source = "endereco")
+@Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
+RetornoTriatomineosDto triatomineosEntidadeParaRetorno(Triatomineos triatomineos); 
 
     //Molusco
     @Mapping(target = "tipoAmostra", constant = "MOLUSCO")
@@ -71,7 +71,8 @@ public interface TipoAmostraMapper {
     @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
     RetornoLarvasDto larvasEntidadeParaRetorno(Larvas larvas);
 
-    ProtocoloAmostraDto listagemAmostras(Amostra amostra);
+    @Mapping(target = "lote", source = "lote", qualifiedByName = "mapearLoteParaProtocolo")
+    ProtocoloListaAmostraDto listagemAmostras(Amostra amostra);
 
 
     //Metodo converter LocalDateTime
